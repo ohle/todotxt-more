@@ -46,7 +46,6 @@ EDITOR='foot -e nvim'
 
 ROFI_BIN="$(command -v rofi)"
 TODO_BIN=$(command -v todo-txt || command -v todo.sh)
-OPENISSUE_BIN=firefox
 
 readonly PROGNAME=$(basename $0)
 
@@ -197,11 +196,6 @@ editpriority() {
 
 timetrack() {
     echo "$1" >> ~/.timetracker.new.log
-}
-
-openissue() {
-    URL=$(echo "$1" | sed -n "$1p" ~/todo.txt | grep -P "issue:https?:\/\/[^[:blank:]]+")
-    $OPENISSUE_BIN $URL
 }
 
 option() {

@@ -6,10 +6,10 @@ action=$1
 shift
 
 [ "$action" = "usage" ] && {
-  echo "  Recently comlpeted tasks:"
-  echo "    show [linenr]"
+  echo "  Show task by item number:"
+  echo "    show [itemno]"
   echo "      show the task on the specified line."
-  echo "    showdone [linenr]"
+  echo "    showdone [itemno]"
   echo "      show the completed task on the specified line."
   echo ""
   exit
