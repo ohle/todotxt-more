@@ -103,8 +103,9 @@ gh = Github(os.environ['GITHUB_TOKEN'])
 ghuser = gh.get_user()
 
 ghissues = {}
-for issue in ghuser.get_user_issues():
+for issue in ghuser.get_user_issues(state="all"):
     ghissues[issue.html_url] = issue
+print(f"Retrieved {len(ghissues)} issues from Github", file=sys.stderr)
 
 ghissues_found = set()
 ghissues_notfound = set()
