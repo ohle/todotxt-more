@@ -1,0 +1,27 @@
+#!/bin/bash
+
+#install this in the .todo.actions.d folder of your todo.txt CLI install.
+
+action=$1
+shift
+
+[ "$action" = "usage" ] && {
+  echo "  Show task by item number:"
+  echo "    show [[-d]] [itemno]"
+  echo "      show the task on the specified line. Add -d to search in done tasks"
+  echo ""
+  exit
+}
+
+if [ "$1" == "-d" ]; then
+    shift
+    target=$DONE_FILE
+else
+    target=$TODO_FILE
+fi
+
+while [ "$#" -gt 0 ] ; do
+    item=$1
+    shift
+    sed -n "${item}p" "$target" 
+done

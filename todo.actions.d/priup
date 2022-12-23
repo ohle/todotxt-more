@@ -1,0 +1,27 @@
+#!/bin/bash
+
+#install this in the .todo.actions.d folder of your todo.txt CLI install.
+
+action=$1
+shift
+
+[ "$action" = "usage" ] && {
+  echo "  Increase priority of item, using C if no priority was set yet:"
+  echo "    show [[-d]] [itemno]"
+  echo "      show the task on the specified line. Add -d to search in done tasks"
+  echo ""
+  exit
+}
+
+if [ "$1" == "-d" ]; then
+    shift
+    target=$DONE_FILE
+else
+    target=$TODO_FILE
+fi
+
+while [ "$#" -gt 0 ] ; do
+    item=$1
+    shift
+    sed -i -r "${item}s/^\(B\)/(A)/; ${item}s/^\(C\)/(B)/; ${item}/^([^\(])/(C) \1/; " "$target" 
+done

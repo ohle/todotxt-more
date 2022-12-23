@@ -1,0 +1,31 @@
+#!/bin/bash
+
+#install this in the .todo.actions.d folder of your todo.txt CLI install.
+
+action=$1
+shift
+
+[ -z "$OPEN_ISSUE_URL" ] && OPEN_ISSUE_URL=xdg-open
+
+[ "$action" = "usage" ] && {
+  echo "  Handle linked issues:"
+  echo "    issue [[-d]] [itemno]"
+  echo "      view the issue (if any). Add -d to search in done tasks"
+  echo ""
+  exit
+}
+
+if [ "$1" == "-d" ]; then
+    shift
+    target=$DONE_FILE
+else
+    target=$TODO_FILE
+fi
+
+item=$1
+url=$(sed -n "${item}p" "$target" | grep -P "issue:http[^[:blank:]]+")
+if [ -n "$url" ]; then
+    $OPEN_ISSUE_URL "$url"
+else
+    echo "No issue found">&2
+fi

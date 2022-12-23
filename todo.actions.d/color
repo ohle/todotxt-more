@@ -1,0 +1,86 @@
+#!/bin/bash
+
+#install this in the .todo.actions.d folder of your todo.txt CLI install.
+
+WORD_REGEX="[[:alnum:]]+"
+
+action=$1
+shift
+
+[ -z "$OPEN_ISSUE_URL" ] && OPEN_ISSUE_URL=xdg-open
+
+[ "$action" = "usage" ] && {
+  echo "  Recolor output:"
+  echo "    color [ansi|pango] [ACTIONS]"
+  echo "      recolor using ansi or pango"
+  echo ""
+  exit
+}
+
+
+mode=ansi
+case $1 in
+    ansi)
+        shift
+        ;;
+    pango)
+        mode=pango
+        shift
+        ;;
+esac
+
+PANGO_MARKUP_LINENO='<small><small><span fgcolor="black">\1<\/span><\/small><\/small>'
+PANGO_MARKUP_PRIORITY_A='<b><span fgcolor="yellow">\1<\/span><\/b>'
+PANGO_MARKUP_PRIORITY_B='<b><span fgcolor="orange">\1<\/span><\/b>'
+PANGO_MARKUP_PRIORITY_C='<b><span fgcolor="darkyellow">\1<\/span><\/b>'
+PANGO_MARKUP_PROJECT='<span fgcolor="darkcyan"><b>\1<\/b><\/span>'
+PANGO_MARKUP_CONTEXT='<span fgcolor="darkmagenta"><b>\1<\/b><\/span>'
+PANGO_MARKUP_TAG='<span fgcolor="darkgreen"><b>\1<\/b><\/span>'
+PANGO_MARKUP_DUE='<span fgcolor="red"><b>\1<\/b><\/span>'
+PANGO_MARKUP_ISSUE='<small><span fgcolor="blue"><b>\1<\/b><\/span><\/small>'
+PANGO_MARKUP_CREATED='<small><span fgcolor="gray"><b>\1<\/b><\/span><\/small>'
+
+ANSI_MARKUP_LINENO='\o033[37;2m\1\o033[0m'
+ANSI_MARKUP_PRIORITY_A='\o033[31;1m\1\o033[0m'
+ANSI_MARKUP_PRIORITY_B='\o033[91;1m\1\o033[0m'
+ANSI_MARKUP_PRIORITY_C='\o033[33;1m\1\o033[0m'
+ANSI_MARKUP_PROJECT='\o033[36;1m\1\o033[0m'
+ANSI_MARKUP_CONTEXT='\o033[35;2m\1\o033[0m'
+ANSI_MARKUP_TAG='\o033[32;2m\1\o033[0m'
+ANSI_MARKUP_DUE='\o033[31;1m\1\o033[0m'
+ANSI_MARKUP_ISSUE='\o033[34;2m\1\o033[0m'
+ANSI_MARKUP_CREATED='\o033[37;2m\1\o033[0m'
+
+
+todo.sh -p "$@" | while read line; do
+    case $mode in
+        ansi)
+            echo -e "${line}" | sed -r "
+                s/^([[:digit:]]+)/${ANSI_MARKUP_LINENO}/g;
+                s/(\(A\))/${ANSI_MARKUP_PRIORITY_A}/g;
+                s/(\(B\))/${ANSI_MARKUP_PRIORITY_B}/g;
+                s/(\(C\))/${ANSI_MARKUP_PRIORITY_C}/g;
+                s/(\+${WORD_REGEX})/${ANSI_MARKUP_PROJECT}/g;
+                s/(\@${WORD_REGEX})/${ANSI_MARKUP_CONTEXT}/g;
+                s/(\#${WORD_REGEX})/${ANSI_MARKUP_TAG}/g;
+                s/(issue:https?:\/\/[^[:blank:]]*)/${ANSI_MARKUP_ISSUE}/g;
+                s/((created|updated):[^[:blank:]]*)/${ANSI_MARKUP_CREATED}/g;
+                s/(due\:[0-9\-]+)/${ANSI_MARKUP_DUE}/g"
+        ;;
+        pango)
+            echo -e "${line}" | sed -r "
+                s/^([[:digit:]]+)/${PANGO_MARKUP_LINENO}/g;
+                s/(\(A\))/${PANGO_MARKUP_PRIORITY_A}/g;
+                s/(\(B\))/${PANGO_MARKUP_PRIORITY_B}/g;
+                s/(\(C\))/${PANGO_MARKUP_PRIORITY_C}/g;
+                s/(\+${WORD_REGEX})/${PANGO_MARKUP_PROJECT}/g;
+                s/(\@${WORD_REGEX})/${PANGO_MARKUP_CONTEXT}/g;
+                s/(\#${WORD_REGEX})/${PANGO_MARKUP_TAG}/g;
+                s/(issue:https?:\/\/[^[:blank:]]*)/${PANGO_MARKUP_ISSUE}/g;
+                s/((created|updated):[^[:blank:]]*)/${PANGO_MARKUP_CREATED}/g;
+                s/(due\:[0-9\-]+)/${PANGO_MARKUP_DUE}/g"
+        ;;
+        *)
+            echo "No such color mode: $mode">&2
+    esac
+done
