@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# install this in the .todo.actions.d folder of your todo.txt CLI install.
+# install this in the ~/.todo.actions.d dir 
 
 # by Maarten van Gompel (proycon) proycon@anaproy.nl
 # GNU Public License v3
