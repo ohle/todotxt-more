@@ -40,8 +40,18 @@ if [ "$1" = "sync" ]; then
 elif [ "$1" = "close" ] || [ "$1" = "c" ]; then
     while [ "$#" -gt 0 ] ; do
         itemno=$1
+        url=$(geturl $itemno)
         shift
         $TODO_FULL_SH done "$itemno"
+        if echo $url | grep -q "github.com"; then
+            curl \
+              -X PATCH \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer $GITHUB_TOKEN"\
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "$(echo "$url" | sed -e 's/https:\/\/github.com\//https:\/\/api.github.com\/repos\//')" \
+              -d '{"state":"closed"}'
+        fi
     done
 else
     itemno=$1
