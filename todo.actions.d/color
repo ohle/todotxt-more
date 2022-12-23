@@ -12,7 +12,9 @@ shift
 [ "$action" = "usage" ] && {
   echo "  Recolor output:"
   echo "    color [ansi|pango] [ACTIONS]"
-  echo "      recolor using ansi or pango"
+  echo "      run command and recolor using ansi or pango"
+  echo "    color [ansi|pango] stdin"
+  echo "      color from standard input"
   echo ""
   exit
 }
@@ -54,7 +56,7 @@ ANSI_MARKUP_CREATED='\o033[37;2m\1\o033[0m'
 ANSI_MARKUP_DONE='\o033[37;2;9m\1\o033[0m'
 
 
-todo.sh -p "$@" | while read line; do
+if [ "$1" = "stdin" ]; then cat; else todo.sh -p "$@"; fi | while read line; do
     if echo "$line" | grep -qE "^[[:digit:]]+ x .*"; then
         case $mode in
             ansi)
@@ -68,7 +70,7 @@ todo.sh -p "$@" | while read line; do
         case $mode in
             ansi)
                 echo -e "${line}" | sed -r "
-                    s/^([[:digit:]]+)/${ANSI_MARKUP_LINENO}/g;
+                    s/^([[:digit:]]+ )/${ANSI_MARKUP_LINENO}/g;
                     s/(\(A\))/${ANSI_MARKUP_PRIORITY_A}/g;
                     s/(\(B\))/${ANSI_MARKUP_PRIORITY_B}/g;
                     s/(\(C\))/${ANSI_MARKUP_PRIORITY_C}/g;
@@ -82,7 +84,7 @@ todo.sh -p "$@" | while read line; do
             pango)
                 echo -e "${line}" | sed -r "
                     s/^([[:digit:]]+ x .*)$/${PANGO_MARKUP_DONE}/g;
-                    s/^([[:digit:]]+)/${PANGO_MARKUP_LINENO}/g;
+                    s/^([[:digit:]]+ )/${PANGO_MARKUP_LINENO}/g;
                     s/(\(A\))/${PANGO_MARKUP_PRIORITY_A}/g;
                     s/(\(B\))/${PANGO_MARKUP_PRIORITY_B}/g;
                     s/(\(C\))/${PANGO_MARKUP_PRIORITY_C}/g;

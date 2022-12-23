@@ -3,6 +3,10 @@
 action=$1
 shift
 
+if [ -z "$TODO_DIR" ]; then
+    echo "TODO_DIR not set">&2
+    exit 2
+fi
 [ -z "$TIMETRACK_FILE" ] && TIMETRACK_FILE="$TODO_DIR/timetrack.txt"
 
 [ "$action" = "usage" ] && {
@@ -11,24 +15,70 @@ shift
   echo "      Start tracking item (stops tracking previous one)"
   echo "    timetrack stop"
   echo "      Stop tracking"
+  echo "    timetrack current [-t]"
+  echo "      Show currently tracked task and the time it was started"
+  echo "      -t - hide the time"
+  echo "      -d - show relative time"
   echo ""
   exit
 }
 
+reltime() {
+    timestamp=$(date -d "$date $time" +%s)
+    nowstamp=$(date +%s)
+    delta=$((nowstamp - timestamp))
+    if [ $delta -lt 60 ]; then
+        echo "${delta}s"
+    else
+        delta=$((delta / 60))
+        if [ $delta -gt 60 ]; then
+            echo "${delta}m"
+        else
+            h=$((delta / 60))
+            m=$((delta % 60))
+            echo "${h}h${m}m"
+        fi
+    fi
+}
+
+
+[ $# -eq 0 ] && set -- current
+
+action=$1
+shift
+
 NOW=$(date "+%Y-%m-%d %a %H:%M")
+
 
 case $action in 
     "start")
         itemno=$1
         shift
-        if [ -z $itemno ]; then
+        if [ -z "$itemno" ]; then
             echo "No item provided" >&2
             exit 1
         fi
-        item=$($TODO_FULL_SH -p view $itemno)
-        echo "$NOW $item" >> $TIMETRACK_FILE
+        item=$($TODO_FULL_SH -p show "$itemno")
+        echo "$NOW $item" >> "$TIMETRACK_FILE"
         ;;
     "stop")
-        echo "$NOW idle" >> $TIMETRACK_FILE
+        echo "$NOW idle" >> "$TIMETRACK_FILE"
+        ;;
+    "current"|"c")
+        line=$(tail "$TIMETRACK_FILE")
+        date=$(echo "$line" | cut -d" " -f 1)
+        time=$(echo "$line" | cut -d" " -f 3)
+        task=$(echo "$line" | cut -d" " -f 4-)
+        if [ "$1" = "-t" ]; then
+            echo "$task"
+        elif [ "$1" = "-d" ]; then
+            reltime=$(reltime "$date" "$time")
+            echo "$reltime $task"
+        else
+            echo "$date $time $task"
+        fi
+        ;;
+    *)
+        echo "Unknown timetrack action: $action">&2to3-2.7
         ;;
 esac

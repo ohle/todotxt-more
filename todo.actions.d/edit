@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# install this in the .todo.actions.d folder of your todo.txt CLI install.
+
+# by Maarten van Gompel (proycon) proycon@anaproy.nl
+# GNU Public License v3
+
+action=$1
+shift
+
+[ "$action" = "usage" ] && {
+  echo "  Edit:"
+  echo "    edit [[itemno]]"
+  echo "      Edit the specified item in the default editor"
+  echo ""
+  exit
+}
+
+itemno=$1
+if [ -n $itemno ]; then
+    case $EDITOR in
+        "")
+            vim "+$itemno" "$TODO_FILE"
+            ;;
+        vim|nvim|vis|gvim|vi|emacs)
+            $EDITOR "+$itemno" "$TODO_FILE"
+            ;;
+        *)
+            $EDITOR "$TODO_FILE"
+            ;;
+    esac
+else
+    $EDITOR "$TODO_FILE"
+fi

@@ -67,17 +67,7 @@ else
             ;;
         5)
             echo "Running editor">&2
-            case $EDITOR in
-                "")
-                    vim "+$itemno" "$TODO_FILE"
-                    ;;
-                vim|nvim|vis|gvim|vi|emacs)
-                    $EDITOR "+$itemno" "$TODO_FILE"
-                    ;;
-                *)
-                    $EDITOR "$TODO_FILE"
-                    ;;
-            esac
+            $TODO_FULL_SH edit $itemno
             ;;
         6)
             echo "Viewing issue">&2

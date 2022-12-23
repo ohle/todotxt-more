@@ -7,7 +7,6 @@ import pytodotxt
 from github import Github
 
 
-
 LABEL_MAP = {
     #from github -> to todo.txt
     "feature": "feat",
