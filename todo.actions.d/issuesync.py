@@ -3,31 +3,23 @@
 import sys
 import os
 import re
+import argparse
+import json
+from itertools import chain
 import pytodotxt
 from github import Github
 
 
-LABEL_MAP = {
-    #from github -> to todo.txt
-    "feature": "feat",
-    "enhancement": "feat"
-}
+#maps github labels to todo.txt tags, e.g:    
+#{
+#   "enhancement": "feat"
+#}
+#these replace the github label
+LABEL_MAP = {}
 
-INFER_FROM_PROJECT = {
-    "folia": ["@work","@huc","@clariah","+wp3t108"],
-    "foliatools": ["@work","@huc","@clariah", "+wp3t108"],
-    "foliautils": ["@work","@huc","@clariah","+wp3t108"],
-    "flat": ["@work","@huc","@clariah","+wp3t062"],
-    "clam": ["@work","@huc","@clariah","+wp3t142"],
-    "frog": ["@work","@huc","@clariah","+wp3t139"],
-    "deepfrog": ["@work","@huc","@clariah","+wp3t139"],
-    "ucto": ["@work","@huc","@clariah","+wp3t139"],
-    "lamachine": ["@work","@huc","@clariah","+wp3t098"],
-    "codemetapy": ["@work","@huc","@clariah","+wp2tooldiscovery"],
-    "codemetaharvester": ["@work","@huc","@clariah","+wp2tooldiscovery"],
-    "codemetaserver": ["@work","@huc","@clariah","+wp2tooldiscovery"],
-    "stam": ["@work","@huc","+clariah","+wp2annotation"],
-}
+#maps projects to tags/contexts/projects, these will be added in addition to the project (rather than replacing it)
+#example: { "frog": ["@work","@huc","@clariah","+wp3t139"] }
+INFER_FROM_PROJECT = {}
 
 
 TAG_RE = re.compile(r'(\s+|^)#([^\s]+)')
@@ -83,8 +75,29 @@ def fmt(s: str) -> str:
     """Formatter for projects/tags"""
     return "".join(c for c in s if c.isalnum()).lower()
 
-todo = pytodotxt.TodoTxt(os.path.expanduser("~/todo.txt"))
+
+parser = argparse.ArgumentParser(description="Issue syncer", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument('--todo','-t',type=str, help="todo.txt file", action='store', required=True)
+parser.add_argument('--done','-d',type=str, help="done.txt file", action='store', required=True)
+parser.add_argument('--labelmap','-l',type=str, help="label file (json)", action='store', required=False)
+parser.add_argument('--infermap','-i',type=str, help="tag inference map (json), infers tags and contexts from projects", action='store', required=False)
+args = parser.parse_args() #parsed arguments can be accessed as attributes
+
+
+TODO_FILE = args.todo
+DONE_FILE = args.done
+if args.labelmap:
+    with open(args.labelmap,'r',encoding='utf-8') as f:
+        LABEL_MAP = json.load(f)
+if args.infermap:
+    with open(args.infermap,'r',encoding='utf-8') as f:
+        INFER_FROM_PROJECT = json.load(f)
+
+todo = pytodotxt.TodoTxt(TODO_FILE)
 todo.parse()
+
+done = pytodotxt.TodoTxt(DONE_FILE)
+done.parse()
 
 gh = Github(os.environ['GITHUB_TOKEN'])
 ghuser = gh.get_user()
@@ -96,7 +109,7 @@ for issue in ghuser.get_user_issues():
 ghissues_found = set()
 ghissues_notfound = set()
 
-for task in todo.tasks:
+for task in chain(todo.tasks,done.tasks):
     if 'issue:https' in task.attributes: #bug in pytodotxt, https is interpeted as part of the key rather than value
         for url in task.attributes['issue:https']:
             url = "https:" + url
@@ -122,14 +135,21 @@ for url, issue in ghissues.items():
         taskline += f" {issue.title} issue:{issue.html_url} created:{created} updated:{updated}"
         task = pytodotxt.Task(taskline)
         infer_from_project(task)
-        todo.add(task)
-        print("Added: ", task, file=sys.stderr)
+        if task.is_completed:
+            done.add(task)
+            print("Added completed: ", task, file=sys.stderr)
+        else:
+            todo.add(task)
+            print("Added: ", task, file=sys.stderr)
 
 #pytodotxt stumbles over symlinks (overwriting them with a new file rather than following them), so we do it this way:
 todo.save(target="/tmp/todo.txt", safe=False)
 with open("/tmp/todo.txt","r",encoding="utf-8") as f_in:
-    with open(os.path.expanduser("~/todo.txt") ,"w+",encoding="utf-8") as f_out:
+    with open(TODO_FILE,"w+",encoding="utf-8") as f_out:
         f_out.write(f_in.read())
 
-
+done.save(target="/tmp/done.txt", safe=False)
+with open("/tmp/done.txt","r",encoding="utf-8") as f_in:
+    with open(DONE_FILE ,"w+",encoding="utf-8") as f_out:
+        f_out.write(f_in.read())
 

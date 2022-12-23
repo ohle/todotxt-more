@@ -1,5 +1,5 @@
 deps:
-	pip install --user -r requirements
+	pip install --user -r requirements.txt
 
 install:
 	mkdir -p ~/.todo.actions.d

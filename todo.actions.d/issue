@@ -5,8 +5,9 @@
 action=$1
 shift
 
+SCRIPTDIR="$(dirname $0)"
+
 [ -z "$TODO_ISSUE_OPENER" ] && TODO_ISSUE_OPENER=xdg-open
-[ -z "$TODO_ISSUE_SYNCER" ] && TODO_ISSUE_SYNCER=todotxtissuesync
 
 [ "$action" = "usage" ] && {
   echo "  Handle linked issues:"
@@ -32,7 +33,10 @@ else
 fi
 
 if [ "$1" = "sync" ]; then
-    $TODO_ISSUE_SYNCER -t "$TODO_FILE" -d "$DONE_FILE"
+    extra=""
+    [ -n "$TODO_ISSUE_LABELMAP" ] && extra="-l $TODO_ISSUE_LABELMAP"
+    [ -n "$TODO_ISSUE_INFERMAP" ] && extra="$extra -i $TODO_ISSUE_INFERMAP"
+    "$SCRIPTDIR/issuesync.py" -t "$TODO_FILE" -d "$DONE_FILE" $extra
 elif [ "$1" = "close" ] || [ "$1" = "c" ]; then
     while [ "$#" -gt 0 ] ; do
         itemno=$1
