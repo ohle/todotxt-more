@@ -18,7 +18,7 @@ fi
 
 [ "$action" = "usage" ] && {
   echo "  Timetrack output:"
-  echo "    timetrack start [itemno]"
+  echo "    timetrack start [itemno|item]"
   echo "      Start tracking item (stops tracking previous one)"
   echo "    timetrack stop"
   echo "      Stop tracking"
@@ -85,7 +85,11 @@ case $action in
             echo "No item provided" >&2
             exit 1
         fi
-        item=$($TODO_FULL_SH -p show "$itemno")
+        if echo "$itemno" | grep -q '^[0-9]+$'; then
+            item=$($TODO_FULL_SH -p show "$itemno")
+        else
+            item=$itemno
+        fi
         echo "$NOW $item" >> "$TIMETRACK_FILE"
         ;;
     "stop")
