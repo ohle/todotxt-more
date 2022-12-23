@@ -28,7 +28,9 @@ while true; do
     if [ -n "$itemno" ]; then
         item=$($TODO_FULL_SH color show "$itemno")
         action=$($TODO_FULL_SH actionmenu | fzf --header "$item" --layout reverse | grep -P "[\dABCq] .*" | cut -d" " -f 1) 
-        [ "$action" = "q" ] || [ -n "$action" ] && break
+        if [ "$action" = "q" ] || [ -z "$action" ]; then
+            break
+        fi
         $TODO_FULL_SH actionmenu "$action" "$itemno"
         sleep 1
     else

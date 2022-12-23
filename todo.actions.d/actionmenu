@@ -69,13 +69,13 @@ else
             echo "Running editor">&2
             case $EDITOR in
                 "")
-                    vim +$itemno $TODO_FILE
+                    vim "+$itemno" "$TODO_FILE"
                     ;;
                 vim|nvim|vis|gvim|vi|emacs)
-                    $EDITOR +$itemno $TODO_FILE
+                    $EDITOR "+$itemno" "$TODO_FILE"
                     ;;
                 *)
-                    $EDITOR $TODO_FILE
+                    $EDITOR "$TODO_FILE"
                     ;;
             esac
             ;;
