@@ -5,27 +5,47 @@
 action=$1
 shift
 
-[ -z "$OPEN_ISSUE_URL" ] && OPEN_ISSUE_URL=xdg-open
+[ -z "$TODO_ISSUE_OPENER" ] && TODO_ISSUE_OPENER=xdg-open
+[ -z "$TODO_ISSUE_SYNCER" ] && TODO_ISSUE_SYNCER=todotxtissuesync
 
 [ "$action" = "usage" ] && {
   echo "  Handle linked issues:"
   echo "    issue [[-d]] [itemno]"
-  echo "      view the issue (if any). Add -d to search in done tasks"
+  echo "      view the issue referenced in the item (if any). Add -d to search in done tasks"
+  echo "    issue sync"
+  echo "      sync issues from remote"
+  echo "    issue close [itemno] ..."
+  echo "      close the reference issue (and the item as a whole)"
   echo ""
   exit
 }
 
-if [ "$1" == "-d" ]; then
+geturl() {
+    sed -n "${1}p" "$target" | grep -Po "issue:http[^[:blank:]]+" | sed 's/issue://'
+}
+
+if [ "$1" = "-d" ]; then
     shift
     target=$DONE_FILE
 else
     target=$TODO_FILE
 fi
 
-item=$1
-url=$(sed -n "${item}p" "$target" | grep -P "issue:http[^[:blank:]]+")
-if [ -n "$url" ]; then
-    $OPEN_ISSUE_URL "$url"
+if [ "$1" = "sync" ]; then
+    $TODO_ISSUE_SYNCER -t "$TODO_FILE" -d "$DONE_FILE"
+elif [ "$1" = "close" ] || [ "$1" = "c" ]; then
+    while [ "$#" -gt 0 ] ; do
+        itemno=$1
+        shift
+        $TODO_FULL_SH done "$itemno"
+    done
 else
-    echo "No issue found">&2
+    itemno=$1
+    url=$(geturl "$itemno")
+    if [ -n "$url" ]; then
+        $TODO_ISSUE_OPENER "$url"
+    else
+        echo "No issue found">&2
+    fi
 fi
+

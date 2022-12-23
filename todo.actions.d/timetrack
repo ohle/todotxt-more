@@ -1,0 +1,34 @@
+#!/bin/bash
+
+action=$1
+shift
+
+[ -z "$TIMETRACK_FILE" ] && TIMETRACK_FILE="$TODO_DIR/timetrack.txt"
+
+[ "$action" = "usage" ] && {
+  echo "  Timetrack output:"
+  echo "    timetrack start [itemno]"
+  echo "      Start tracking item (stops tracking previous one)"
+  echo "    timetrack stop"
+  echo "      Stop tracking"
+  echo ""
+  exit
+}
+
+NOW=$(date "+%Y-%m-%d %a %H:%M")
+
+case $action in 
+    "start")
+        itemno=$1
+        shift
+        if [ -z $itemno ]; then
+            echo "No item provided" >&2
+            exit 1
+        fi
+        item=$($TODO_FULL_SH -p view $itemno)
+        echo "$NOW $item" >> $TIMETRACK_FILE
+        ;;
+    "stop")
+        echo "$NOW idle" >> $TIMETRACK_FILE
+        ;;
+esac

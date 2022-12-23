@@ -1,0 +1,109 @@
+#!/bin/bash
+
+# install this in the .todo.actions.d folder of your todo.txt CLI install.
+
+# by Maarten van Gompel (proycon) proycon@anaproy.nl
+# GNU Public License v3
+
+action=$1
+shift
+
+[ "$action" = "usage" ] && {
+  echo "  Action menu:"
+  echo "    actionmenu"
+  echo "      Shows or processing items for the action menu, not meant to be used directly"
+  echo "    actionmenu [action] [itemno]"
+  echo "      Run the action on the item number"
+  echo ""
+  exit
+}
+
+if [ $# -eq 0 ]; then
+echo -e "0 - Start task (track in log)
+1 - Mark as done
+2 - Increase priority
+3 - Decrease priority
+4 - Remove priority
+5 - Edit
+6 - View issue
+7 - Print to output
+A - Set priority A
+B - Set priority B
+C - Set priority C
+q - Quit"
+else
+    action=$1
+    itemno=$2
+
+    if [ -z "$action" ]; then
+        echo "No action passed">&2
+        exit 1
+    fi
+    if [ -z "$itemno" ]; then
+        echo "No item number passed">&2
+        exit 1
+    fi
+
+    case $action in
+        0)
+            echo "Starting timetrack">&2
+            $TODO_FULL_SH timetrack start $itemno
+            ;;
+        1)
+            echo "Marking as done">&2
+            $TODO_FULL_SH done $itemno
+            ;;
+        2)
+            echo "Increasing priority">&2
+            $TODO_FULL_SH priup $itemno
+            ;;
+        3)
+            echo "Decreasing priority">&2
+            $TODO_FULL_SH pridown $itemno
+            ;;
+        4)
+            echo "Removing priority">&2
+            $TODO_FULL_SH depri $itemno
+            ;;
+        5)
+            echo "Running editor">&2
+            case $EDITOR in
+                "")
+                    vim +$itemno $TODO_FILE
+                    ;;
+                vim|nvim|vis|gvim|vi|emacs)
+                    $EDITOR +$itemno $TODO_FILE
+                    ;;
+                *)
+                    $EDITOR $TODO_FILE
+                    ;;
+            esac
+            ;;
+        6)
+            echo "Viewing issue">&2
+            $TODO_FULL_SH issue $itemno
+            ;;
+        7)
+            $TODO_FULL_SH color show $itemno
+            ;;
+        A)
+            echo "Setting priority">&2
+            $TODO_FULL_SH pri $itemno A
+            ;;
+        B)
+            echo "Setting priority">&2
+            $TODO_FULL_SH pri $itemno B
+            ;;
+        C)
+            echo "Setting priority">&2
+            $TODO_FULL_SH pri $itemno C
+            ;;
+        q)
+            exit 0
+            ;;
+        *)
+            echo "Unknown action: $action">&2
+            ;;
+    esac
+fi
+
