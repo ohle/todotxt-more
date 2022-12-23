@@ -26,7 +26,7 @@ echo -e "0 - Start task (track in log)
 4 - Remove priority
 5 - Edit
 6 - View issue
-7 - Print to output
+8 - Print to output
 A - Set priority A
 B - Set priority B
 C - Set priority C
@@ -51,7 +51,7 @@ else
             ;;
         1)
             echo "Marking as done">&2
-            $TODO_FULL_SH done $itemno
+            $TODO_FULL_SH issue done $itemno
             ;;
         2)
             echo "Increasing priority">&2

@@ -15,8 +15,8 @@ SCRIPTDIR="$(dirname $0)"
   echo "      view the issue referenced in the item (if any). Add -d to search in done tasks"
   echo "    issue sync"
   echo "      sync issues from remote"
-  echo "    issue close [itemno] ..."
-  echo "      close the reference issue (and the item as a whole)"
+  echo "    issue close|done [itemno] ..."
+  echo "      close the reference issue (and mark the item as a whole as done)"
   echo ""
   exit
 }
@@ -37,13 +37,13 @@ if [ "$1" = "sync" ]; then
     [ -n "$TODO_ISSUE_LABELMAP" ] && extra="-l $TODO_ISSUE_LABELMAP"
     [ -n "$TODO_ISSUE_INFERMAP" ] && extra="$extra -i $TODO_ISSUE_INFERMAP"
     "$SCRIPTDIR/issuesync.py" -t "$TODO_FILE" -d "$DONE_FILE" $extra
-elif [ "$1" = "close" ] || [ "$1" = "c" ]; then
+elif [ "$1" = "done" ] || [ "$1" = "do" ] || [ "$1" = "close" ] || [ "$1" = "c" ]; then
     while [ "$#" -gt 0 ] ; do
         itemno=$1
         url=$(geturl $itemno)
         shift
         $TODO_FULL_SH done "$itemno"
-        if echo $url | grep -q "github.com"; then
+        if echo "$url" | grep -q "github.com"; then
             curl \
               -X PATCH \
               -H "Accept: application/vnd.github+json" \
