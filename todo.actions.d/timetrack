@@ -5,6 +5,7 @@ die() {
     exit 2
 }
 
+SCRIPTDIR="$(dirname $0)"
 
 action=$1
 shift
@@ -31,6 +32,7 @@ fi
   echo "      Options:"
   echo "      -d - show relative time deltas"
   echo "      -s - show relative time deltas in seconds"
+  echo "      Note: todatetime is non-inclusive"
   echo ""
   exit
 }
@@ -47,6 +49,11 @@ reltime() {
 
 fmtreltime() {
     delta=$(reltime "$1" "$2" "$3")
+    fmttimedelta "$delta"
+}
+
+fmttimedelta() {
+    delta=$1
     if [ "$delta" -lt 60 ]; then
         echo "${delta}s"
     else
@@ -135,14 +142,13 @@ case $action in
                     echo $line
                 fi
             fi
-            if [ -n "$prevdate" ]; then
+            if [ -n "$prevdate" ] && [ $output_delta -ne 0 ] ; then
                 if [ $output_delta -eq 1 ]; then
                     reltime=$(fmtreltime "$prevdate" "$prevtime" "$date $time")
-                    echo "$reltime $prevtask"
                 elif [ $output_delta -eq 2 ]; then
                     reltime=$(reltime "$prevdate" "$prevtime" "$date $time")
-                    echo "$reltime $prevtask"
                 fi
+                [ "$prevtask" != "idle" ] && echo "$reltime $prevtask"
             fi
             if [ $timestamp -gt $fromtimestamp ] && [ $timestamp -lt $totimestamp ]; then
                 prevtask=$task
@@ -152,7 +158,33 @@ case $action in
             fi
         done
         ;;
+    daysummary)
+        if [ -z "$1" ]; then
+            fromdatetime="$(date +"%Y-%m-%d")"
+        else
+            fromdatetime=$1
+            shift
+        fi
+        timestamp=$(date -d "$fromdatetime" +%s)
+        if [ -z "$1" ];  then
+            days=1
+        else
+            days=$1
+            shift
+        fi
+        for _ in $(seq "$days"); do
+            datelabel="$(date -d @$timestamp +"%Y-%m-%d %a")"
+            todatetime=$(date -d @$((timestamp + 86401)) +"%Y-%m-%d")
+            $TODO_FULL_SH timetrack log -s "$fromdatetime" "$todatetime" | "$SCRIPTDIR/timetrack_sum.py" | while read line; do
+                class=$(echo "$line" | cut -d" " -f 1)
+                duration=$(echo "$line" | cut -d" " -f 2)
+                echo "$datelabel $class $(fmttimedelta "$duration")"
+            done
+            timestamp=$((timestamp + 86401))
+            echo
+        done
+        ;;
     *)
-        echo "Unknown timetrack action: $action">&2to3-2.7
+        echo "Unknown timetrack action: $action">&2
         ;;
 esac
