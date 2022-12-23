@@ -1,5 +1,11 @@
 #!/bin/bash
 
+die() {
+    echo "$@">&2
+    exit 2
+}
+
+
 action=$1
 shift
 
@@ -19,19 +25,33 @@ fi
   echo "      Show currently tracked task and the time it was started"
   echo "      -t - hide the time"
   echo "      -d - show relative time"
+  echo "      -s - show relative time in seconds"
+  echo "    timetrack log [[options]] [[fromdatetime]] [[todatetime]]"
+  echo "      (Datetime is in Y-m-d H:M:S format, time component may be omitted)"
+  echo "      Options:"
+  echo "      -d - show relative time deltas"
+  echo "      -s - show relative time deltas in seconds"
   echo ""
   exit
 }
 
 reltime() {
-    timestamp=$(date -d "$date $time" +%s)
-    nowstamp=$(date +%s)
-    delta=$((nowstamp - timestamp))
-    if [ $delta -lt 60 ]; then
+    timestamp=$(date -d "$1 $2" +%s)
+    if [ -n "$3" ]; then
+        refstamp=$(date -d "$3" +%s)
+    else
+        refstamp=$(date +%s)
+    fi
+    echo $((refstamp - timestamp))
+}
+
+fmtreltime() {
+    delta=$(reltime "$1" "$2" "$3")
+    if [ "$delta" -lt 60 ]; then
         echo "${delta}s"
     else
         delta=$((delta / 60))
-        if [ $delta -gt 60 ]; then
+        if [ $delta -lt 60 ]; then
             echo "${delta}m"
         else
             h=$((delta / 60))
@@ -65,18 +85,72 @@ case $action in
         echo "$NOW idle" >> "$TIMETRACK_FILE"
         ;;
     "current"|"c")
-        line=$(tail "$TIMETRACK_FILE")
+        line=$(tail -n 1 "$TIMETRACK_FILE")
         date=$(echo "$line" | cut -d" " -f 1)
         time=$(echo "$line" | cut -d" " -f 3)
         task=$(echo "$line" | cut -d" " -f 4-)
         if [ "$1" = "-t" ]; then
             echo "$task"
         elif [ "$1" = "-d" ]; then
+            reltime=$(fmtreltime "$date" "$time")
+            echo "$reltime $task"
+        elif [ "$1" = "-s" ]; then
             reltime=$(reltime "$date" "$time")
             echo "$reltime $task"
         else
             echo "$date $time $task"
         fi
+        ;;
+    "log")
+        if [ "$1" = "-d" ]; then
+            output_delta=1
+            shift
+        elif [ "$1" = "-s" ]; then
+            output_delta=2 #raw
+            shift
+        else
+            output_delta=0
+        fi
+        if [ -z "$1" ]; then
+            fromtimestamp=0
+        else
+            fromtimestamp=$(date -d "$1" +%s)
+            shift
+        fi
+        if [ -z "$1" ];  then
+            totimestamp=$(date +%s)
+        else
+            totimestamp=$(date -d "$1" +%s)
+            shift
+        fi
+        prevdatetime=""
+        prevtask=""
+        cat "$TIMETRACK_FILE" | while read line ; do
+            date=$(echo "$line" | cut -d" " -f 1)
+            time=$(echo "$line" | cut -d" " -f 3)
+            task=$(echo "$line" | cut -d" " -f 4-)
+            timestamp=$(date -d "$date $time" +%s)
+            if [ $timestamp -gt $fromtimestamp ] && [ $timestamp -lt $totimestamp ]; then
+                if [ $output_delta -eq 0 ]; then
+                    echo $line
+                fi
+            fi
+            if [ -n "$prevdate" ]; then
+                if [ $output_delta -eq 1 ]; then
+                    reltime=$(fmtreltime "$prevdate" "$prevtime" "$date $time")
+                    echo "$reltime $prevtask"
+                elif [ $output_delta -eq 2 ]; then
+                    reltime=$(reltime "$prevdate" "$prevtime" "$date $time")
+                    echo "$reltime $prevtask"
+                fi
+            fi
+            if [ $timestamp -gt $fromtimestamp ] && [ $timestamp -lt $totimestamp ]; then
+                prevtask=$task
+                prevdate="$date"
+                prevtime="$time"
+                [ $timestamp -gt $totimestamp ] && break
+            fi
+        done
         ;;
     *)
         echo "Unknown timetrack action: $action">&2to3-2.7
