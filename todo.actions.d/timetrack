@@ -85,7 +85,7 @@ case $action in
             echo "No item provided" >&2
             exit 1
         fi
-        if echo "$itemno" | grep -q '^[0-9]+$'; then
+        if echo "$itemno" | grep -qE '^[0-9]+$'; then
             item=$($TODO_FULL_SH -p show "$itemno")
         else
             item=$itemno
