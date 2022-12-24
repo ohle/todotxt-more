@@ -48,6 +48,7 @@ else
         0)
             echo "Starting timetrack">&2
             $TODO_FULL_SH timetrack start $itemno
+            exit 0
             ;;
         1)
             echo "Marking as done">&2
@@ -68,10 +69,12 @@ else
         5)
             echo "Running editor">&2
             $TODO_FULL_SH edit $itemno
+            exit 0
             ;;
         6)
             echo "Viewing issue">&2
             $TODO_FULL_SH issue $itemno
+            exit 0
             ;;
         7)
             $TODO_FULL_SH color show $itemno
