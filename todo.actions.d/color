@@ -32,9 +32,9 @@ case $1 in
 esac
 
 PANGO_MARKUP_LINENO='<small><small><span fgcolor="black">\1<\/span><\/small><\/small>'
-PANGO_MARKUP_PRIORITY_A='<b><span fgcolor="yellow">\1<\/span><\/b>'
+PANGO_MARKUP_PRIORITY_A='<b><span fgcolor="red">\1<\/span><\/b>'
 PANGO_MARKUP_PRIORITY_B='<b><span fgcolor="orange">\1<\/span><\/b>'
-PANGO_MARKUP_PRIORITY_C='<b><span fgcolor="darkyellow">\1<\/span><\/b>'
+PANGO_MARKUP_PRIORITY_C='<b><span fgcolor="yellow">\1<\/span><\/b>'
 PANGO_MARKUP_PROJECT='<span fgcolor="darkcyan"><b>\1<\/b><\/span>'
 PANGO_MARKUP_CONTEXT='<span fgcolor="darkmagenta"><b>\1<\/b><\/span>'
 PANGO_MARKUP_TAG='<span fgcolor="darkgreen"><b>\1<\/b><\/span>'
