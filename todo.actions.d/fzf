@@ -24,14 +24,16 @@ fi
 
 itemno=""
 while true; do
-    itemno=$($TODO_FULL_SH color "$@" | fzf --ansi --no-hscroll --layout reverse | grep -P "\d+ .*$" | cut -d" " -f 1)
+    itemno=$($TODO_FULL_SH format "$@" | fzf --ansi --no-hscroll --layout reverse | grep -P "\d+ .*$" | cut -d" " -f 1)
     if [ -n "$itemno" ]; then
-        item=$($TODO_FULL_SH color show "$itemno")
+        item=$($TODO_FULL_SH format show "$itemno")
         action=$($TODO_FULL_SH actionmenu | fzf --header "$item" --layout reverse | grep -P "[\dABCq] .*" | cut -d" " -f 1) 
         if [ "$action" = "q" ] || [ -z "$action" ]; then
             break
         fi
-        $TODO_FULL_SH actionmenu "$action" "$itemno"
+        if ! $TODO_FULL_SH actionmenu "$action" "$itemno"; then
+            break
+        fi
         sleep 1
     else
         break

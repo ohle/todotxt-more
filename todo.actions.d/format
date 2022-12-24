@@ -10,11 +10,11 @@ shift
 [ -z "$OPEN_ISSUE_URL" ] && OPEN_ISSUE_URL=xdg-open
 
 [ "$action" = "usage" ] && {
-  echo "  Recolor output:"
-  echo "    color [ansi|pango] [ACTIONS]"
+  echo "  Format/recolor output:"
+  echo "    format [ansi|pango] [ACTIONS]"
   echo "      run command and recolor using ansi or pango"
-  echo "    color [ansi|pango] stdin"
-  echo "      color from standard input"
+  echo "    format [ansi|pango] stdin"
+  echo "      reads from standard input"
   echo ""
   exit
 }
@@ -96,7 +96,7 @@ if [ "$1" = "stdin" ]; then cat; else todo.sh -p "$@"; fi | while read line; do
                     s/(due\:[0-9\-]+)/${PANGO_MARKUP_DUE}/g"
             ;;
             *)
-                echo "No such color mode: $mode">&2
+                echo "No such format: $mode">&2
         esac
     fi
 done
