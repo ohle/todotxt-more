@@ -1,0 +1,22 @@
+#!/bin/bash
+
+#install this in the .todo.actions.d folder of your todo.txt CLI install.
+
+action=$1
+shift
+
+SCRIPTDIR="$(dirname $0)"
+
+[ -z $TODOTXT_NOTMUCH_SEARCH ] && TODOTXT_NOTMUCH_SEARCH="tag:todo or tag:reply"
+
+[ "$action" = "usage" ] && {
+  echo "  Handle linked issues:"
+  echo "    notmuch"
+  echo "      sync notmuch mails by query: $TODOTXT_NOTMUCH_SEARCH"
+  echo ""
+  exit
+}
+
+extra=""
+[ -n "$TODOTXT_NOTMUCH_MAP" ] && extra="-m $TODOTXT_NOTMUCH_MAP"
+notmuch search --format json "$TODOTXT_NOTMUCH_SEARCH" |  $SCRIPTDIR/notmuch.py -t $TODO_FILE -d $DONE_FILE $extra

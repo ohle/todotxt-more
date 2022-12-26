@@ -11,6 +11,7 @@ This is a set of complementary extensions for todo.txt .
 * `fzf` - Control todo.txt interactively via fzf (a terminal based fuzzy finder)
 * `issue` - View and sync issues (sync with Github)
 * `timetrack` - Track time on projects and contexts, and produce summary reports 
+* `notmuch` - Sync with notmuch mail based on tags like 'todo' and/or 'reply' 
 
 
 
