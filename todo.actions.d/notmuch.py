@@ -34,14 +34,16 @@ notmuch_found = set()
 
 threads = json.load(sys.stdin)
 threads = { thread['thread']: thread for thread in threads }
+changed = False
 
 for task in chain(todo.tasks,done.tasks):
     if 'notmuch:' in task.attributes: #bug in pytodotxt, https is interpeted as part of the key rather than value
         thread_id = task.attributes['notmuch']
         notmuch_found.add(thread_id)
         if thread_id not in threads:
-            print("No longer tagged todo/reply in notmuch, marking as completed: ", task)
+            print("No longer tagged todo/reply in notmuch, marking as completed: ", task, file=sys.stderr)
             task.is_completed = True
+            changed = True
     
 for thread_id, thread in threads.items():
     if thread_id not in notmuch_found:
@@ -57,22 +59,28 @@ for thread_id, thread in threads.items():
             taskline += " #reply"
         taskline += " " + thread['subject'] 
         taskline += f" notmuch:{thread_id}"
+        added_tags = set()
         for tag in thread['tags']:
             if tag in tagmap:
                 for xtag in tagmap[tag]:
-                    taskline += f" {xtag}"
+                    if xtag not in added_tags:
+                        added_tags.add(xtag)
+                        taskline += f" {xtag}"
         task = pytodotxt.Task(taskline)
-        print(task)
+        todo.add(task)
+        print("Added task:", task, file=sys.stderr)
+        changed = True
 
 
+if changed:
 #pytodotxt stumbles over symlinks (overwriting them with a new file rather than following them), so we do it this way:
-todo.save(target="/tmp/todo.txt", safe=False)
-with open("/tmp/todo.txt","r",encoding="utf-8") as f_in:
-    with open(TODO_FILE,"w+",encoding="utf-8") as f_out:
-        f_out.write(f_in.read())
+    todo.save(target="/tmp/todo.txt", safe=False)
+    with open("/tmp/todo.txt","r",encoding="utf-8") as f_in:
+        with open(TODO_FILE,"w+",encoding="utf-8") as f_out:
+            f_out.write(f_in.read())
 
-done.save(target="/tmp/done.txt", safe=False)
-with open("/tmp/done.txt","r",encoding="utf-8") as f_in:
-    with open(DONE_FILE ,"w+",encoding="utf-8") as f_out:
-        f_out.write(f_in.read())
+    done.save(target="/tmp/done.txt", safe=False)
+    with open("/tmp/done.txt","r",encoding="utf-8") as f_in:
+        with open(DONE_FILE ,"w+",encoding="utf-8") as f_out:
+            f_out.write(f_in.read())
 

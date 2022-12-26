@@ -83,7 +83,7 @@ if [ "$1" = "stdin" ]; then cat; else todo.sh -p "$@"; fi | while read line; do
                     s/(\@${WORD_REGEX})/${ANSI_MARKUP_CONTEXT}/g;
                     s/(\#${WORD_REGEX})/${ANSI_MARKUP_TAG}/g;
                     s/(issue:https?:\/\/[^[:blank:]]*)/${ANSI_MARKUP_ISSUE}/g;
-                    s/(notmuch:[[:digit:]]+)/${ANSI_MARKUP_NOTMUCH}/g;
+                    s/(notmuch:[a-z0-9]+)/${ANSI_MARKUP_NOTMUCH}/g;
                     s/((created|updated):[^[:blank:]]*)/${ANSI_MARKUP_UPDATED}/g;
                     s/(due\:[0-9\-]+)/${ANSI_MARKUP_DUE}/g"
             ;;
@@ -99,7 +99,7 @@ if [ "$1" = "stdin" ]; then cat; else todo.sh -p "$@"; fi | while read line; do
                     s/(\@${WORD_REGEX})/${PANGO_MARKUP_CONTEXT}/g;
                     s/(\#${WORD_REGEX})/${PANGO_MARKUP_TAG}/g;
                     s/(issue:https?:\/\/[^[:blank:]]*)/${PANGO_MARKUP_ISSUE}/g;
-                    s/(notmuch:[[:digit:]]+)/${PANGO_MARKUP_NOTMUCH}/g;
+                    s/(notmuch:[a-z0-9]+)/${PANGO_MARKUP_NOTMUCH}/g;
                     s/((created|updated):[^[:blank:]]*)/${PANGO_MARKUP_UPDATED}/g;
                     s/(due\:[0-9\-]+)/${PANGO_MARKUP_DUE}/g"
             ;;
