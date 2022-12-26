@@ -1,0 +1,22 @@
+#!/bin/bash
+
+#install this in the .todo.actions.d folder of your todo.txt CLI install.
+
+action=$1
+shift
+
+SCRIPTDIR="$(dirname $0)"
+
+[ "$action" = "usage" ] && {
+  echo "  Fancy list:"
+  echo "    fancy [actions]"
+  echo "      Shortcut to show a fancy list with relative dates, sorting and ansi colours, can be used with any list action"
+  echo ""
+  exit
+}
+
+if [ "$#" -eq 0 ]; then
+    set -- list
+fi
+
+$TODO_FULL_SH relsort $@ | $TODO_FULL_SH format ansi stdin

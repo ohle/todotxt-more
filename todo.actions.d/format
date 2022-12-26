@@ -40,7 +40,8 @@ PANGO_MARKUP_CONTEXT='<span fgcolor="darkmagenta"><b>\1<\/b><\/span>'
 PANGO_MARKUP_TAG='<span fgcolor="darkgreen"><b>\1<\/b><\/span>'
 PANGO_MARKUP_DUE='<span fgcolor="red"><b>\1<\/b><\/span>'
 PANGO_MARKUP_ISSUE='<small><span fgcolor="blue"><b>\1<\/b><\/span><\/small>'
-PANGO_MARKUP_CREATED='<small><span fgcolor="gray"><b>\1<\/b><\/span><\/small>'
+PANGO_MARKUP_UPDATED='<small><span fgcolor="gray"><b>\1<\/b><\/span><\/small>'
+PANGO_MARKUP_RELTIME='<span fgcolor="gray"><i>\1<\/i><\/span>'
 PANGO_MARKUP_DONE='<s><span fgcolor="gray">\1<\/span><\/s>'
 
 ANSI_MARKUP_LINENO='\o033[37;2m\1\o033[0m'
@@ -52,7 +53,8 @@ ANSI_MARKUP_CONTEXT='\o033[35;2m\1\o033[0m'
 ANSI_MARKUP_TAG='\o033[32;2m\1\o033[0m'
 ANSI_MARKUP_DUE='\o033[31;1m\1\o033[0m'
 ANSI_MARKUP_ISSUE='\o033[34;2m\1\o033[0m'
-ANSI_MARKUP_CREATED='\o033[37;2m\1\o033[0m'
+ANSI_MARKUP_UPDATED='\o033[37;2m\1\o033[0m'
+ANSI_MARKUP_RELTIME='\o033[37;2m\1\o033[0m'
 ANSI_MARKUP_DONE='\o033[37;2;9m\1\o033[0m'
 
 
@@ -71,6 +73,7 @@ if [ "$1" = "stdin" ]; then cat; else todo.sh -p "$@"; fi | while read line; do
             ansi)
                 echo -e "${line}" | sed -r "
                     s/^([[:digit:]]+ )/${ANSI_MARKUP_LINENO}/g;
+                    s/([[:digit:]]+d )/${ANSI_MARKUP_RELTIME}/g;
                     s/(\(A\))/${ANSI_MARKUP_PRIORITY_A}/g;
                     s/(\(B\))/${ANSI_MARKUP_PRIORITY_B}/g;
                     s/(\(C\))/${ANSI_MARKUP_PRIORITY_C}/g;
@@ -78,12 +81,13 @@ if [ "$1" = "stdin" ]; then cat; else todo.sh -p "$@"; fi | while read line; do
                     s/(\@${WORD_REGEX})/${ANSI_MARKUP_CONTEXT}/g;
                     s/(\#${WORD_REGEX})/${ANSI_MARKUP_TAG}/g;
                     s/(issue:https?:\/\/[^[:blank:]]*)/${ANSI_MARKUP_ISSUE}/g;
-                    s/((created|updated):[^[:blank:]]*)/${ANSI_MARKUP_CREATED}/g;
+                    s/((created|updated):[^[:blank:]]*)/${ANSI_MARKUP_UPDATED}/g;
                     s/(due\:[0-9\-]+)/${ANSI_MARKUP_DUE}/g"
             ;;
             pango)
                 echo -e "${line}" | sed -r "
                     s/^([[:digit:]]+ x .*)$/${PANGO_MARKUP_DONE}/g;
+                    s/([[:digit:]]+d )/${PANGO_MARKUP_RELTIME}/g;
                     s/^([[:digit:]]+ )/${PANGO_MARKUP_LINENO}/g;
                     s/(\(A\))/${PANGO_MARKUP_PRIORITY_A}/g;
                     s/(\(B\))/${PANGO_MARKUP_PRIORITY_B}/g;
@@ -92,7 +96,7 @@ if [ "$1" = "stdin" ]; then cat; else todo.sh -p "$@"; fi | while read line; do
                     s/(\@${WORD_REGEX})/${PANGO_MARKUP_CONTEXT}/g;
                     s/(\#${WORD_REGEX})/${PANGO_MARKUP_TAG}/g;
                     s/(issue:https?:\/\/[^[:blank:]]*)/${PANGO_MARKUP_ISSUE}/g;
-                    s/((created|updated):[^[:blank:]]*)/${PANGO_MARKUP_CREATED}/g;
+                    s/((created|updated):[^[:blank:]]*)/${PANGO_MARKUP_UPDATED}/g;
                     s/(due\:[0-9\-]+)/${PANGO_MARKUP_DUE}/g"
             ;;
             *)

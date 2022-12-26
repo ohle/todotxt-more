@@ -13,7 +13,7 @@ shift
 [ "$action" = "usage" ] && {
   echo "  Fuzzy search:"
   echo "    fzf [ACTIONS]"
-  echo "      pass actions through fzf and make them actionable"
+  echo "      pass list actions through fzf and make them actionable"
   echo ""
   exit
 }
@@ -24,7 +24,7 @@ fi
 
 itemno=""
 while true; do
-    itemno=$($TODO_FULL_SH format "$@" | fzf --ansi --no-hscroll --layout reverse | grep -P "\d+ .*$" | cut -d" " -f 1)
+    itemno=$($TODO_FULL_SH relsort "$@" | $TODO_FULL_SH format ansi stdin | fzf --ansi --no-sort --no-hscroll --layout reverse | grep -P "\d+ .*$" | cut -d" " -f 1)
     if [ -n "$itemno" ]; then
         item=$($TODO_FULL_SH format show "$itemno")
         action=$($TODO_FULL_SH actionmenu | fzf --header "$item" --layout reverse | grep -P "[\dABCq] .*" | cut -d" " -f 1) 

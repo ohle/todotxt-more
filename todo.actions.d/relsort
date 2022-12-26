@@ -1,0 +1,18 @@
+#!/bin/bash
+
+#install this in the .todo.actions.d folder of your todo.txt CLI install.
+
+action=$1
+shift
+
+SCRIPTDIR="$(dirname $0)"
+
+[ "$action" = "usage" ] && {
+  echo "  Show task by item number:"
+  echo "    relsort [actions]"
+  echo "      Convert completion dates into relative time (=days) compared to now and sort accordingly"
+  echo ""
+  exit
+}
+
+$TODO_FULL_SH -p $@ | $SCRIPTDIR/relsort.py | sort -k1 | cut -d" " -f2- | sed -re "s/0*([1-9]+[0-9]*d) /\1 /"

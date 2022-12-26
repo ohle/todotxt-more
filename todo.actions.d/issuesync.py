@@ -128,12 +128,12 @@ for url, issue in ghissues.items():
         taskline = ""
         if issue.state != "open":
             taskline += "x "
-        taskline += f"+{fmt(issue.repository.name)}"
+        created = issue.created_at.strftime("%Y-%m-%d")
+        taskline += f"{created} +{fmt(issue.repository.name)}"
         for label in issue.labels:
             taskline += f" #{fmtlabel(label.name)}"
-        created = issue.created_at.strftime("%Y-%m-%d")
         updated = issue.updated_at.strftime("%Y-%m-%d")
-        taskline += f" {issue.title} issue:{issue.html_url} created:{created} updated:{updated}"
+        taskline += f" {issue.title} issue:{issue.html_url} updated:{updated}"
         task = pytodotxt.Task(taskline)
         infer_from_project(task)
         if task.is_completed:
