@@ -28,7 +28,7 @@ fi
 
 itemno=""
 while true; do
-    result=$($TODO_FULL_SH relsort "$@" | $TODO_FULL_SH format pango stdin | rofi -matching glob -tokenize -i -no-sort -no-levenshtein-sort -markup -markup-rows -dmenu -p ">" -mesg "todo.txt" -kb-custom-1 "Alt-a" -kb-custom-2 "Alt-e" -kb-custom-3 "Alt-d")
+    result=$($TODO_FULL_SH relsort "$@" | $TODO_FULL_SH format pango stdin | rofi -matching glob -tokenize -i -no-sort -no-levenshtein-sort -markup -markup-rows -dmenu -p ">" -mesg "todo.txt - <span fgcolor=\"gray\">alt-e = edit, alt-a = add, alt-d = done, alt-k = priup, alt-j = pridown</span>" -kb-custom-1 "Alt-a" -kb-custom-2 "Alt-e" -kb-custom-3 "Alt-d" -kb-custom-4 "Alt-j" -kb-custom-4 "Alt-k")
     ret=$?
     itemno=$(echo "$result" | striptags | grep -Po "\d+ .*$" | cut -d" " -f 1)
     case $ret in
@@ -42,6 +42,12 @@ while true; do
             ;;
         12)
             $TODO_FULL_SH done "$itemno"
+            ;;
+        13)
+            $TODO_FULL_SH priup "$itemno"
+            ;;
+        14)
+            $TODO_FULL_SH pridown "$itemno"
             ;;
         0)
             if [ -n "$itemno" ]; then
