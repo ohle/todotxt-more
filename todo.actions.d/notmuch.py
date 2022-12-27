@@ -38,7 +38,7 @@ changed = False
 
 for task in chain(todo.tasks,done.tasks):
     if 'notmuch' in task.attributes: #bug in pytodotxt, https is interpeted as part of the key rather than value
-        thread_id = task.attributes['notmuch']
+        thread_id = task.attributes['notmuch'][0]
         notmuch_found.add(thread_id)
         if thread_id not in threads:
             print("No longer tagged todo/reply in notmuch, marking as completed: ", task, file=sys.stderr)
