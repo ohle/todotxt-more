@@ -25,10 +25,11 @@ if [ $# -eq 0 ]; then
 fi
 
 [ -z $TERMINAL_CMD ] && TERMINAL_CMD="foot -e"
+[ -z "$TIMETRACK_FILE" ] && TIMETRACK_FILE="$TODO_DIR/timetrack.txt"
 
 itemno=""
 while true; do
-    result=$($TODO_FULL_SH relsort "$@" | $TODO_FULL_SH format pango stdin | rofi -matching glob -tokenize -i -no-sort -no-levenshtein-sort -markup -markup-rows -dmenu -p ">" -mesg "todo.txt - <span fgcolor=\"gray\">alt-e = edit, alt-a = add, alt-d = done, alt-k = priup, alt-j = pridown</span>" -kb-custom-1 "Alt-a" -kb-custom-2 "Alt-e" -kb-custom-3 "Alt-d" -kb-custom-4 "Alt-j" -kb-custom-4 "Alt-k")
+    result=$($TODO_FULL_SH relsort "$@" | $TODO_FULL_SH format pango stdin | rofi -matching glob -tokenize -i -no-sort -no-levenshtein-sort -markup -markup-rows -dmenu -p ">" -mesg "todo.txt - <span fgcolor=\"gray\">alt-e = edit, alt-a = add, alt-d = done, alt-k = priup, alt-j = pridown, alt-t = edit timetrack</span>" -kb-custom-1 "Alt-a" -kb-custom-2 "Alt-e" -kb-custom-3 "Alt-d" -kb-custom-4 "Alt-j" -kb-custom-5 "Alt-k" -kb-custom-6 "Alt-t")
     ret=$?
     itemno=$(echo "$result" | striptags | grep -Po "\d+ .*$" | cut -d" " -f 1)
     case $ret in
@@ -48,6 +49,9 @@ while true; do
             ;;
         14)
             $TODO_FULL_SH pridown "$itemno"
+            ;;
+        15)
+            $TERMINAL_CMD $EDITOR +999999 "$TIMETRACK_FILE"
             ;;
         0)
             if [ -n "$itemno" ]; then
