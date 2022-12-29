@@ -50,7 +50,7 @@ At any time, there should only be a limited number of items carrying a priority,
 
 To display your tasks non-interactively, we recommend you use `todo.sh fancy` (short for `todo.sh fancy list`) rather than the traditional `todo.sh list`. It will invoke the `format` and `relsort` extensions to do better colour highlighting and better relative sorting. You can pass any arguments you pass to `list` to sort by context or project. Here is an example:
 
-![todo.sh fancy list](docs/fancylist.png)
+![todo.sh fancy list](doc/fancylist.png)
 
 You can note the following in this example:
 
@@ -61,17 +61,17 @@ You can note the following in this example:
 
 If you run `todo.sh fzf list @work`, you'd the same view, but interactively using fzf, allowing you to fuzzy search.
 
-![todo.sh fancy list](docs/fzf.png)
+![todo.sh fancy list](doc/fzf.png)
 
 Or run `todo.sh rofi list @work`, for the same thing in rofi, which opens a graphical menu. This is great to tie to a keybinding in your (tiling?) window manager: 
 
-![todo.sh rofi list](docs/rofi.png)
+![todo.sh rofi list](doc/rofi.png)
 
 Note that your rofi may look different depending on the theme you are using.
 
 The rofi method even binds some shortcuts keys for quick actions like prioritisation and editing. Once you select an item in either rofi or fzf, you're presented with an action menu (`todo.sh actionmenu`)
 
-![action menu](docs/actionmenu.png)
+![action menu](doc/actionmenu.png)
 
 ### Issue syncing
 
