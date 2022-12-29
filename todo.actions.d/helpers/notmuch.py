@@ -7,6 +7,7 @@ import datetime
 from itertools import chain
 import pytodotxt
 
+
 parser = argparse.ArgumentParser(description="Notmuch syncer, reads 'notmuch search --format=json' output from stdin", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('--todo','-t',type=str, help="todo.txt file", action='store', required=True)
 parser.add_argument('--done','-d',type=str, help="done.txt file", action='store', required=True)

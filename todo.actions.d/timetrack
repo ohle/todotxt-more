@@ -179,7 +179,7 @@ case $action in
         for _ in $(seq "$days"); do
             datelabel="$(date -d @$timestamp +"%Y-%m-%d %a")"
             todatetime=$(date -d @$((timestamp + 86401)) +"%Y-%m-%d")
-            $TODO_FULL_SH timetrack log -s "$fromdatetime" "$todatetime" | "$SCRIPTDIR/timetrack_sum.py" | while read line; do
+            $TODO_FULL_SH timetrack log -s "$fromdatetime" "$todatetime" | "$SCRIPTDIR/helpers/timetrack_sum.py" | while read line; do
                 class=$(echo "$line" | cut -d" " -f 1)
                 duration=$(echo "$line" | cut -d" " -f 2)
                 echo "$datelabel $class $(fmttimedelta "$duration")"

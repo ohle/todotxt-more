@@ -19,4 +19,4 @@ SCRIPTDIR="$(dirname $0)"
 
 extra=""
 [ -n "$TODOTXT_NOTMUCH_MAP" ] && extra="-m $TODOTXT_NOTMUCH_MAP"
-notmuch search --format json "$TODOTXT_NOTMUCH_SEARCH" |  $SCRIPTDIR/notmuch.py -t $TODO_FILE -d $DONE_FILE $extra
+notmuch search --format json "$TODOTXT_NOTMUCH_SEARCH" |  $SCRIPTDIR/helpers/notmuch.py -t $TODO_FILE -d $DONE_FILE $extra

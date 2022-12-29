@@ -36,7 +36,7 @@ if [ "$1" = "sync" ]; then
     extra=""
     [ -n "$TODO_ISSUE_LABELMAP" ] && extra="-l $TODO_ISSUE_LABELMAP"
     [ -n "$TODO_ISSUE_INFERMAP" ] && extra="$extra -i $TODO_ISSUE_INFERMAP"
-    "$SCRIPTDIR/issuesync.py" -t "$TODO_FILE" -d "$DONE_FILE" $extra
+    "$SCRIPTDIR/helpers/issuesync.py" -t "$TODO_FILE" -d "$DONE_FILE" $extra
 elif [ "$1" = "done" ] || [ "$1" = "do" ] || [ "$1" = "close" ] || [ "$1" = "c" ]; then
     while [ "$#" -gt 0 ] ; do
         itemno=$1

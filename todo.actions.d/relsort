@@ -15,4 +15,4 @@ SCRIPTDIR="$(dirname $0)"
   exit
 }
 
-$TODO_FULL_SH -p $@ | $SCRIPTDIR/relsort.py | sort -k1 | cut -d" " -f2- | sed -re "s/0*([1-9]+[0-9]*d) /\1 /"
+$TODO_FULL_SH -p $@ | $SCRIPTDIR/helpers/relsort.py | sort -k1 | cut -d" " -f2- | sed -re "s/0*([1-9]+[0-9]*d) /\1 /"
