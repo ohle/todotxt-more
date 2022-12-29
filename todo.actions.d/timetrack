@@ -87,7 +87,7 @@ case $action in
             exit 1
         fi
         if echo "$itemno" | grep -qE '^[0-9]+$'; then
-            item=$($TODO_FULL_SH -p show "$itemno")
+            item=$($TODO_FULL_SH -p show "$itemno" | sed -e 's/(\([A-C]\)) //')
         else
             item=$itemno
         fi
