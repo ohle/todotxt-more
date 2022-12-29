@@ -37,11 +37,19 @@ fi
   echo "    timetrack summary [[options]] [[fromdatetime]] [[todatetime]]"
   echo "      Shows a time spent summary, over the specified period"
   echo "      (Datetime is in Y-m-d H:M:S format, time component may be omitted)"
+  echo "      Options:"
+  echo "      -a|--all - show all tasks, not only aggregates"
   echo "      Note: todatetime is non-inclusive"
   echo "    timetrack daysummary [[options]] [[fromdatetime]] [[days]]"
   echo "      Shows a time spent summary, aggregated per day, over the specified period"
   echo "      (Datetime is in Y-m-d H:M:S format, time component may be omitted)"
   echo "      Note: days is the number of days, inclusive"
+  echo "    timetrack weeksummary [[options]] [[fromdatetime]] [[weeks]]"
+  echo "      Shows a time spent summary, aggregated per week, over the specified period"
+  echo "      (fromdatetime is in Y-m-d format and should be a monday that starts the week)"
+  echo "      Note: weeks is the number of weeks, inclusive"
+  echo "    timetrack monthsummary [[options]] [year...]"
+  echo "      Shows a time spent summary, aggregated per month, over the specified years"
   echo ""
   exit
 }
@@ -143,19 +151,26 @@ case $action in
             totimestamp=$(date -d "$1" +%s)
             shift
         fi
-        prevdatetime=""
+        prevdate="$fromtimestamp"
         prevtask=""
-        cat "$TIMETRACK_FILE" | while read line ; do
+        #add an idle entry so we catch the current item as well if needed
+        if [ "$totimestamp" -ge "$(date +%s)" ]; then
+            echo "$NOW now" > /tmp/timetrack.idle
+        else
+            echo >/tmp/timetrack.idle
+        fi
+        cat "$TIMETRACK_FILE" /tmp/timetrack.idle | while read line ; do
+            [ -z "$line" ] && continue
             date=$(echo "$line" | cut -d" " -f 1)
             time=$(echo "$line" | cut -d" " -f 3)
-            task=$(echo "$line" | cut -d" " -f 4-)
             timestamp=$(date -d "$date $time" +%s)
             if [ $timestamp -gt $fromtimestamp ] && [ $timestamp -lt $totimestamp ]; then
                 if [ $output_delta -eq 0 ]; then
-                    echo $line
+                    echo "$line"
                 fi
             fi
-            if [ -n "$prevdate" ] && [ $output_delta -ne 0 ] ; then
+            task=$(echo "$line" | cut -d" " -f 4-)
+            if [ -n "$prevtask" ] && [ $output_delta -ne 0 ] ; then
                 if [ $output_delta -eq 1 ]; then
                     reltime=$(fmtreltime "$prevdate" "$prevtime" "$date $time")
                 elif [ $output_delta -eq 2 ]; then
@@ -168,10 +183,18 @@ case $action in
                 prevdate="$date"
                 prevtime="$time"
                 [ $timestamp -gt $totimestamp ] && break
+            else
+                prevtask=""
             fi
         done
         ;;
     summary)
+        if [ $1 = "--all" ] || [ "$1" = "-a" ]; then
+            extra="--all"
+            shift
+        else
+            extra=""
+        fi
         if [ -z "$1" ]; then
             fromdatetime="$(date +"%Y-%m-%d")"
         else
@@ -184,20 +207,32 @@ case $action in
             todatetime=$1
             shift
         fi
-        $TODO_FULL_SH timetrack log -s "$fromdatetime" "$todatetime" | "$SCRIPTDIR/helpers/timetrack_sum.py" | while read line; do
-            class=$(echo "$line" | cut -d" " -f 1)
-            duration=$(echo "$line" | cut -d" " -f 2)
-            echo "$datelabel $class $(fmttimedelta "$duration")"
+        if [ -n "$1" ]; then
+            label="$1 "
+            shift
+        else
+            label=""
+        fi
+        $TODO_FULL_SH timetrack log -s "$fromdatetime" "$todatetime" | "$SCRIPTDIR/helpers/timetrack_sum.py" $extra | while read line; do
+            class=$(echo "$line" | cut -d" " -f 2-)
+            duration=$(echo "$line" | cut -d" " -f 1)
+            echo "$label$(fmttimedelta "$duration") $class"
         done
         ;;
     daysummary)
+        if [ $1 = "--all" ] || [ "$1" = "-a" ]; then
+            extra="--all"
+            shift
+        else
+            extra=""
+        fi
         if [ -z "$1" ]; then
             fromdatetime="$(date +"%Y-%m-%d")"
         else
             fromdatetime=$1
             shift
         fi
-        timestamp=$(date -d "$fromdatetime" +%s)
+        timestamp=$(date -d "$fromdatetime 00:00:00" +%s)
         if [ -z "$1" ];  then
             days=1
         else
@@ -206,14 +241,65 @@ case $action in
         fi
         for _ in $(seq "$days"); do
             datelabel="$(date -d @$timestamp +"%Y-%m-%d %a")"
+            fromdatetime=$(date -d @$timestamp +"%Y-%m-%d")
             todatetime=$(date -d @$((timestamp + 86401)) +"%Y-%m-%d")
-            $TODO_FULL_SH timetrack log -s "$fromdatetime" "$todatetime" | "$SCRIPTDIR/helpers/timetrack_sum.py" | while read line; do
-                class=$(echo "$line" | cut -d" " -f 1)
-                duration=$(echo "$line" | cut -d" " -f 2)
-                echo "$datelabel $class $(fmttimedelta "$duration")"
-            done
+            $TODO_FULL_SH timetrack summary $extra "$fromdatetime" "$todatetime" "$datelabel"
             timestamp=$((timestamp + 86401))
             echo
+        done
+        ;;
+    weeksummary)
+        if [ $1 = "--all" ] || [ "$1" = "-a" ]; then
+            extra="--all"
+            shift
+        else
+            extra=""
+        fi
+        if [ -z "$1" ]; then
+            fromdatetime="$(date +"%Y-%m-%d")"
+        else
+            fromdatetime=$1
+            shift
+        fi
+        timestamp=$(date -d "$fromdatetime 00:00:00" +%s)
+        if [ -z "$1" ];  then
+            weeks=1
+        else
+            weeks=$1
+            shift
+        fi
+        for _ in $(seq "$weeks"); do
+            datelabel="$(date -d @$timestamp +"%Y-%m-%d w%W")"
+            fromdatetime=$(date -d @$timestamp +"%Y-%m-%d")
+            todatetime=$(date -d @$((timestamp + 604800)) +"%Y-%m-%d")
+            $TODO_FULL_SH timetrack summary $extra "$fromdatetime" "$todatetime" "$datelabel"
+            timestamp=$((timestamp + 604800))
+            echo
+        done
+        ;;
+    monthsummary)
+        if [ $1 = "--all" ] || [ "$1" = "-a" ]; then
+            extra="--all"
+            shift
+        else
+            extra=""
+        fi
+        if [ $# -eq 0 ]; then
+            set -- "$(date +"%Y")"
+        fi
+        for year in "$@"; do
+            for month in $(seq 1 12); do
+                nextmonth=$((month + 1))
+                if [ "$nextmonth" = "13" ] ; then
+                    todatetime="$((year+1))-01-01"
+                else
+                    nextmonth="$(printf "%02d" "$nextmonth")"
+                    todatetime="$year-$nextmonth-01"
+                fi
+                month="$(printf "%02d" "$month")"
+                $TODO_FULL_SH timetrack summary $extra "$year-$month-01" "$todatetime" "$year-$month"
+                timestamp=$((timestamp + 604800))
+            done
         done
         ;;
     *)
