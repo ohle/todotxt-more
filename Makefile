@@ -1,4 +1,4 @@
-deps:
+pythondeps:
 	pip install --user -r requirements.txt
 
 install:
