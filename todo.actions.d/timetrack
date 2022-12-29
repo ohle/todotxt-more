@@ -28,12 +28,20 @@ fi
   echo "      -d - show relative time"
   echo "      -s - show relative time in seconds"
   echo "    timetrack log [[options]] [[fromdatetime]] [[todatetime]]"
+  echo "      Shows the timetrack log for the given time period"
   echo "      (Datetime is in Y-m-d H:M:S format, time component may be omitted)"
   echo "      Options:"
   echo "      -d - show relative time deltas"
   echo "      -s - show relative time deltas in seconds"
   echo "      Note: todatetime is non-inclusive"
-  echo "    timetrack daysummary [[options]] [[fromdatetime]] [[todatetime]]"
+  echo "    timetrack summary [[options]] [[fromdatetime]] [[todatetime]]"
+  echo "      Shows a time spent summary, over the specified period"
+  echo "      (Datetime is in Y-m-d H:M:S format, time component may be omitted)"
+  echo "      Note: todatetime is non-inclusive"
+  echo "    timetrack daysummary [[options]] [[fromdatetime]] [[days]]"
+  echo "      Shows a time spent summary, aggregated per day, over the specified period"
+  echo "      (Datetime is in Y-m-d H:M:S format, time component may be omitted)"
+  echo "      Note: days is the number of days, inclusive"
   echo ""
   exit
 }
@@ -124,13 +132,13 @@ case $action in
             output_delta=0
         fi
         if [ -z "$1" ]; then
-            fromtimestamp=0
+            fromtimestamp=$(date --date="today 00:00:00" +%s)
         else
             fromtimestamp=$(date -d "$1" +%s)
             shift
         fi
         if [ -z "$1" ];  then
-            totimestamp=$(date +%s)
+            totimestamp=$(date --date="tomorrow 00:00:00" +%s)
         else
             totimestamp=$(date -d "$1" +%s)
             shift
@@ -161,6 +169,25 @@ case $action in
                 prevtime="$time"
                 [ $timestamp -gt $totimestamp ] && break
             fi
+        done
+        ;;
+    summary)
+        if [ -z "$1" ]; then
+            fromdatetime="$(date +"%Y-%m-%d")"
+        else
+            fromdatetime=$1
+            shift
+        fi
+        if [ -z "$1" ]; then
+            todatetime="$(date --date="tomorrow" +"%Y-%m-%d")"
+        else
+            todatetime=$1
+            shift
+        fi
+        $TODO_FULL_SH timetrack log -s "$fromdatetime" "$todatetime" | "$SCRIPTDIR/helpers/timetrack_sum.py" | while read line; do
+            class=$(echo "$line" | cut -d" " -f 1)
+            duration=$(echo "$line" | cut -d" " -f 2)
+            echo "$datelabel $class $(fmttimedelta "$duration")"
         done
         ;;
     daysummary)

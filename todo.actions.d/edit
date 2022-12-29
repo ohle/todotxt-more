@@ -12,6 +12,8 @@ shift
   echo "  Edit:"
   echo "    edit [[itemno]]"
   echo "      Edit the specified item in the default editor"
+  echo "    edit"
+  echo "      Open todo.txt in the editor"
   echo ""
   exit
 }
