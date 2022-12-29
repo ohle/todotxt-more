@@ -6,9 +6,9 @@ action=$1
 shift
 
 [ "$action" = "usage" ] && {
-  echo "  Increase priority of item, using C if no priority was set yet:"
-  echo "    show [[-d]] [itemno]"
-  echo "      show the task on the specified line. Add -d to search in done tasks"
+  echo "  Priority changing:"
+  echo "    priup [itemno]"
+  echo "      Increase the priority of the item number, unprioritized becomes C"
   echo ""
   exit
 }

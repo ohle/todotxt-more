@@ -6,9 +6,9 @@ action=$1
 shift
 
 [ "$action" = "usage" ] && {
-  echo "  Decrease priority of item, deprioritize after C:"
-  echo "    show [[-d]] [itemno]"
-  echo "      show the task on the specified line. Add -d to search in done tasks"
+  echo "  Priority changing:"
+  echo "    pridown [itemno]"
+  echo "      Decreases the priority of the item number, deprioritize after C"
   echo ""
   exit
 }
