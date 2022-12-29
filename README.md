@@ -134,9 +134,14 @@ The `todo.txt notmuch` extension syncs with your notmuch database. It runs a que
 
 Employers often require you to track your working hours, especially if you a working on a variety of distinct projects. Keeping track of this manually is a waste of time. If you have your `todo.txt` workflow in place, we can simply take advantage of this for tracking time as well. This is done using `todo.txt timetrack` and it can be invoked interactively via the action menu as presented by fzf or rofi. When you say *start task* a simply eentry of the full task line, prepended with the current date and time, is registered to a file `timetrack.txt` that lives alongside your `todo.txt` and `done.txt`. Only one task can be tracked at any given time (people suck at multitasking anyway, so better not pretend you can do it). When you start a new task the previous one ends. There is also `todo.sh timetrack stop` to stop tracking, which will simply register an *idle* entry in `timetrack.txt`. I recommend to automatically trigger this action when your screensaver/screenlock kicks in so you don't have to worry about it.
 
-To see the task you are currently working on, issue `todo.sh timetrack current`. This may be worth adding to whatever bar (waybar/polybar/dwm's bar/etc) you use so you can see it at all times.
+To see the task you are currently working on, run `todo.sh timetrack current`. This may be worth adding to whatever bar (waybar/polybar/dwm's bar/etc) you use so you can see it at all times.
 
-The `timetrack.txt` log can be visualised with `todo.sh timetrack log`, it optionally takes a start date and an end date (non-inclusive) as parameters (YYYY-MM-DD). Add the `-d` option if you want to have relative time (durations), use `-s` instead if you want it in raw seconds.
+```
+$ todo.sh timetrack current -d                  
+1h13m +todotxtmore implement timetrack summary options @hobby
+```
+
+The `timetrack.txt` log can be visualised with `todo.sh timetrack log`, it optionally takes a start date and an end date (non-inclusive) as parameters (YYYY-MM-DD). Add the `-d` option if you want to have relative time (durations), use `-s` instead if you want it in raw seconds, these are also available for `timetrack current` as shown above.
 
 Using `todo.sh timetrack daysummary` you can get a summary of total time spent, per day, on specific contexts or projects. It aggregates for each day all projects (``+``) and contexts (`@`) mentioned in the log.
 
