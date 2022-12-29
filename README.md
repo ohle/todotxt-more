@@ -136,7 +136,19 @@ Employers often require you to tracks your working hours, especially if you a wo
 
 To see the task you are currently working on, issue `todo.sh timetrack current`. This may be worth adding to whatever bar (waybar/polybar/dwm's bar/etc) you use so you can see it at all times.
 
-The `timetrack.txt` log can be analyzed with `timetrack log`, it takes a start date and an enddate and aggregate per project and per context how much time was spent. It takes a start date and optionally and end date as parameters (in YYYY-MM-DD format).
+The `timetrack.txt` log can be visualised with `todo.sh timetrack log`, it optionally takes a start date and an end date as parameters (YYYY-MM-DD). Add the `-d` option if you want to have relative time (durations), use `-s` instead if you want it in raw seconds.
+
+Using `todo.sh timetrack daysummary` you can get a summary of total time spent, per day, on specific contexts or projects. It aggregate all projects (``+``) and contexts (`@`) mentioned in the log.
+
+Example output:
+
+```
+$ todo.sh timetrack daysummary 2022-12-29
+2022-12-29 Thu @generic 14m
+2022-12-29 Thu @entertainment 14m
+2022-12-29 Thu @hobby 4h44m
+```
+
 
 ### Further usage
 
