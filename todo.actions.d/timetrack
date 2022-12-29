@@ -33,6 +33,7 @@ fi
   echo "      -d - show relative time deltas"
   echo "      -s - show relative time deltas in seconds"
   echo "      Note: todatetime is non-inclusive"
+  echo "    timetrack daysummary [[options]] [[fromdatetime]] [[todatetime]]"
   echo ""
   exit
 }

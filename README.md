@@ -59,7 +59,7 @@ You can note the following in this example:
 * tasks with a creation date will be shown using their relative date in days (e.g. 6d) , and sorted accordingly.
 * you see tasks synced from the GitHub (issue) and from my mail (notmuch), more about this later...
 
-If you run `todo.sh fzf list @work`, you'd the same view, but interactively using fzf, allowing you to fuzzy search.
+If you run `todo.sh fzf list @work`, you'd the see same view, but interactively using fzf, allowing you to do fuzzy search.
 
 ![todo.sh fancy list](doc/fzf.png)
 
@@ -138,7 +138,7 @@ To see the task you are currently working on, issue `todo.sh timetrack current`.
 
 The `timetrack.txt` log can be visualised with `todo.sh timetrack log`, it optionally takes a start date and an end date as parameters (YYYY-MM-DD). Add the `-d` option if you want to have relative time (durations), use `-s` instead if you want it in raw seconds.
 
-Using `todo.sh timetrack daysummary` you can get a summary of total time spent, per day, on specific contexts or projects. It aggregate all projects (``+``) and contexts (`@`) mentioned in the log.
+Using `todo.sh timetrack daysummary` you can get a summary of total time spent, per day, on specific contexts or projects. It aggregates for each day all projects (``+``) and contexts (`@`) mentioned in the log.
 
 Example output:
 
