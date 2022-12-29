@@ -144,11 +144,15 @@ Example output:
 
 ```
 $ todo.sh timetrack daysummary 2022-12-29
-2022-12-29 Thu @generic 14m
-2022-12-29 Thu @entertainment 14m
-2022-12-29 Thu @hobby 4h44m
+2022-12-29 Thu 8h52m @hobby
+2022-12-29 Thu 4h8m +todotxtmore
+2022-12-29 Thu 14m @generic
+2022-12-29 Thu 14m @entertainment
 ```
 
+Be aware that the context and projects used in aggregation are not mutually exclusive. You can use any combination you want.
+
+Similarly, there is a `weeksummary` and `monthsummary` that aggregates per week/month. You may add the `-all` parameter to see individual tasks again (rather than just contexts and projects).
 
 ### Further usage
 
@@ -165,6 +169,8 @@ Once installed, see `todo.sh help` for complete usage information:
   Edit:
     edit [[itemno]]
       Edit the specified item in the default editor
+    edit
+      Open todo.txt in the editor
 
   Fancy list:
     fancy [actions]
@@ -192,13 +198,13 @@ Once installed, see `todo.sh help` for complete usage information:
     notmuch
       sync notmuch mails by query: tag:todo or tag:reply
 
-  Decrease priority of item, deprioritize after C:
-    show [[-d]] [itemno]
-      show the task on the specified line. Add -d to search in done tasks
+  Priority changing:
+    pridown [itemno]
+      Decreases the priority of the item number, deprioritize after C
 
-  Increase priority of item, using C if no priority was set yet:
-    show [[-d]] [itemno]
-      show the task on the specified line. Add -d to search in done tasks
+  Priority changing:
+    priup [itemno]
+      Increase the priority of the item number, unprioritized becomes C
 
   Show task by item number:
     relsort [actions]
@@ -223,14 +229,27 @@ Once installed, see `todo.sh help` for complete usage information:
       -d - show relative time
       -s - show relative time in seconds
     timetrack log [[options]] [[fromdatetime]] [[todatetime]]
+      Shows the timetrack log for the given time period
       (Datetime is in Y-m-d H:M:S format, time component may be omitted)
       Options:
       -d - show relative time deltas
       -s - show relative time deltas in seconds
       Note: todatetime is non-inclusive
+    timetrack summary [[options]] [[fromdatetime]] [[todatetime]]
+      Shows a time spent summary, over the specified period
+      (Datetime is in Y-m-d H:M:S format, time component may be omitted)
+      Options:
+      -a|--all - show all tasks, not only aggregates
+      Note: todatetime is non-inclusive
+    timetrack daysummary [[options]] [[fromdatetime]] [[days]]
+      Shows a time spent summary, aggregated per day, over the specified period
+      (Datetime is in Y-m-d H:M:S format, time component may be omitted)
+      Note: days is the number of days, inclusive
+    timetrack weeksummary [[options]] [[fromdatetime]] [[weeks]]
+      Shows a time spent summary, aggregated per week, over the specified period
+      (fromdatetime is in Y-m-d format and should be a monday that starts the week)
+      Note: weeks is the number of weeks, inclusive
+    timetrack monthsummary [[options]] [year...]
+      Shows a time spent summary, aggregated per month, over the specified years
+
 ```
-
-
-
-
-
