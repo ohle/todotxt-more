@@ -35,6 +35,7 @@ PANGO_MARKUP_LINENO='<small><small><span fgcolor="black">\1<\/span><\/small><\/s
 PANGO_MARKUP_PRIORITY_A='<b><span fgcolor="red">\1<\/span><\/b>'
 PANGO_MARKUP_PRIORITY_B='<b><span fgcolor="orange">\1<\/span><\/b>'
 PANGO_MARKUP_PRIORITY_C='<b><span fgcolor="yellow">\1<\/span><\/b>'
+PANGO_MARKUP_PRIORITY_D='<b><span fgcolor="blue">\1<\/span><\/b>'
 PANGO_MARKUP_PROJECT='<span fgcolor="darkcyan"><b>\1<\/b><\/span>'
 PANGO_MARKUP_CONTEXT='<span fgcolor="darkmagenta"><b>\1<\/b><\/span>'
 PANGO_MARKUP_TAG='<span fgcolor="darkgreen"><b>\1<\/b><\/span>'
@@ -49,6 +50,7 @@ ANSI_MARKUP_LINENO='\o033[37;2m\1\o033[0m'
 ANSI_MARKUP_PRIORITY_A='\o033[31;1m\1\o033[0m'
 ANSI_MARKUP_PRIORITY_B='\o033[91;1m\1\o033[0m'
 ANSI_MARKUP_PRIORITY_C='\o033[33;1m\1\o033[0m'
+ANSI_MARKUP_PRIORITY_D='\o033[34;1m\1\o033[0m'
 ANSI_MARKUP_PROJECT='\o033[36;1m\1\o033[0m'
 ANSI_MARKUP_CONTEXT='\o033[35;2m\1\o033[0m'
 ANSI_MARKUP_TAG='\o033[32;2m\1\o033[0m'
@@ -79,6 +81,7 @@ if [ "$1" = "stdin" ]; then cat; else todo.sh -p "$@"; fi | while read line; do
                     s/(\(A\))/${ANSI_MARKUP_PRIORITY_A}/g;
                     s/(\(B\))/${ANSI_MARKUP_PRIORITY_B}/g;
                     s/(\(C\))/${ANSI_MARKUP_PRIORITY_C}/g;
+                    s/(\(D\))/${ANSI_MARKUP_PRIORITY_D}/g;
                     s/(\+${WORD_REGEX})/${ANSI_MARKUP_PROJECT}/g;
                     s/(\@${WORD_REGEX})/${ANSI_MARKUP_CONTEXT}/g;
                     s/(\#${WORD_REGEX})/${ANSI_MARKUP_TAG}/g;
@@ -95,6 +98,7 @@ if [ "$1" = "stdin" ]; then cat; else todo.sh -p "$@"; fi | while read line; do
                     s/(\(A\))/${PANGO_MARKUP_PRIORITY_A}/g;
                     s/(\(B\))/${PANGO_MARKUP_PRIORITY_B}/g;
                     s/(\(C\))/${PANGO_MARKUP_PRIORITY_C}/g;
+                    s/(\(D\))/${PANGO_MARKUP_PRIORITY_D}/g;
                     s/(\+${WORD_REGEX})/${PANGO_MARKUP_PROJECT}/g;
                     s/(\@${WORD_REGEX})/${PANGO_MARKUP_CONTEXT}/g;
                     s/(\#${WORD_REGEX})/${PANGO_MARKUP_TAG}/g;

@@ -39,11 +39,12 @@ You can run `make pythondeps` to install the python dependencies locally (uses `
 ## Usage & Workflow
 
 
-This extension set assumes you make use of priorities A, B and C only. I use them as follows in a kind of kanban-style:
+This extension set assumes you make use of priorities A, B and C only (and D as a special category). I use them as follows in a kind of kanban-style:
 
 * *(A)* for tasks to do on today
 * *(B)* for tasks to do later this week
 * *(C)* for tasks after this week (limited)
+* *(D)* for tasks that are temporarily blocked/waiting on hold
 * Tasks without a priority are the backlog 
 
 At any time, there should only be a limited number of items carrying a priority, and it should be easy to increase/decrease priority of a task via either `priup`/`pridown`, or interactively using the `rofi` or `fzf` interfaces.

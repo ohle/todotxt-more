@@ -30,6 +30,7 @@ echo -e "0 - Start task (track in log)
 A - Set priority A
 B - Set priority B
 C - Set priority C
+D - Set priority D (waiting/blocked)
 q - Quit"
 else
     action=$1
@@ -91,6 +92,10 @@ else
         C)
             echo "Setting priority">&2
             $TODO_FULL_SH pri $itemno C
+            ;;
+        D)
+            echo "Setting priority">&2
+            $TODO_FULL_SH pri $itemno D
             ;;
         q)
             exit 0
