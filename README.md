@@ -8,7 +8,7 @@ This is a set of complementary extensions for todo.txt .
 * `edit` - Invokes editor to edit todo.txt. 
 * `show` - Show a single task based on item number
 * `priup` - Priority up
-* `pridown` - Priority down (up to C)
+* `pridown` - Priority down (down to C, depriotitised after)
 * `rofi` - Control todo.txt interactively via rofi (a menu program)
 * `fzf` - Control todo.txt interactively via fzf (a terminal based fuzzy finder)
 * `issue` - View and sync issues (sync with Github)
