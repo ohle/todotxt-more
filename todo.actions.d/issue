@@ -54,6 +54,7 @@ elif [ "$1" = "done" ] || [ "$1" = "do" ] || [ "$1" = "close" ] || [ "$1" = "c" 
         fi
     done
 else
+    [ "$1" = "view" ] && shift
     itemno=$1
     url=$(geturl "$itemno")
     if [ -n "$url" ]; then

@@ -24,7 +24,7 @@ if [ $# -eq 0 ]; then
     set -- list
 fi
 
-[ -z $TERMINAL_CMD ] && TERMINAL_CMD="foot -e"
+[ -z $TERMINAL_CMD ] && export TERMINAL_CMD="foot -e"
 [ -z "$TIMETRACK_FILE" ] && TIMETRACK_FILE="$TODO_DIR/timetrack.txt"
 
 itemno=""

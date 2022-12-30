@@ -121,7 +121,8 @@ There are a few limitations to be aware of:
 
 Another common source of todo tasks is email. I often receive mails that require some kind of follow-up action, or that I simply have to reply to. I am using [notmuch](https://notmuchmail.org) as a means to add tags to my mail and make it quickly searchable. I use a *reply* tag for mail I still have to reply to, and *todo* for mail that requires another follow-up actions. Of course, I want both in my `todo.txt` so I have everything in one place again. 
 
-The `todo.txt notmuch` extension syncs with your notmuch database. It runs a query (defined in environment variable `$TODOTXT_NOTMUCH_SEARCH`, which defaults to `tag:todo or tag:reply` fitting my own use-case) and adds all threads it finds to `todo.txt`. It is a one-way sync. Synced mails received the context `@mail` and the notmuch tag translates to a hashtag. Any further mappings between notmuch tags and todo.txt can be configured in a JSON file, filename stored in `$TODOTXT_NOTMUCH_MAP`. Example:
+
+The `todo.txt notmuch` extension syncs with your notmuch database. It runs a query (defined in environment variable `$TODOTXT_NOTMUCH_SEARCH`, which defaults to `tag:todo or tag:reply` fitting my own use-case) and adds all threads it finds to `todo.txt`. It is a one-way sync. Synced mails receive the context `@mail` and the notmuch tag translates to a hashtag. Any further mappings between notmuch tags and todo.txt can be configured in a JSON file, filename stored in `$TODOTXT_NOTMUCH_MAP`. Example:
 
 ```json
 {
@@ -131,6 +132,28 @@ The `todo.txt notmuch` extension syncs with your notmuch database. It runs a que
     "folia": ["+folia","@huc","@work"]
 }
 ```
+
+Results when listing may look as follows:
+
+```
+$ todo.sh fancy list @mail
+221 (C) 7d @mail #reply Frog voor MacOS notmuch:00000000000268a8 +frog @huc @work
+225 (C) 13d @mail #reply [PATCH sxmo-utils] Drop busybox aliases notmuch:000000000001a40a +sxmo @hobby
+```
+
+Referenced notmuch threads can be viewed in your mail client (configured via `$TODOXT_NOTMUCH_MAILCMD`, set to neomutt by default):
+
+```
+$ todo.sh notmuch view 225
+```
+
+You can also mark a task as done via the notmuch extension, which will take care of removing the notmuch tags for you as well (configured via `$TODOTXT_NOTMUCH_UNTAG`).
+
+```
+$ todo.sh notmuch done 225
+```
+
+Of course all this is also available via the action menu offered by the rofi/fzf interfaces.
 
 ### Time tracking
 

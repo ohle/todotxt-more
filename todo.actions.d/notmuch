@@ -8,15 +8,78 @@ shift
 SCRIPTDIR="$(dirname $0)"
 
 [ -z $TODOTXT_NOTMUCH_SEARCH ] && TODOTXT_NOTMUCH_SEARCH="tag:todo or tag:reply"
+[ -z $TODOTXT_NOTMUCH_UNTAG ] && TODOTXT_NOTMUCH_UNTAG="-todo -reply -inbox"
+[ -z $TODOTXT_NOTMUCH_MAILCMD ] && TODOTXT_NOTMUCH_MAILCMD="neomutt -f notmuch://?query=thread:"
 
 [ "$action" = "usage" ] && {
-  echo "  Handle linked issues:"
-  echo "    notmuch"
+  echo "  Handle linked mails:"
+  echo "    notmuch sync"
   echo "      sync notmuch mails by query: $TODOTXT_NOTMUCH_SEARCH"
+  echo "    notmuch done [itemno]"
+  echo "      mark the task and the corresponding mail as done ($TODOTXT_NOTMUCH_UNTAG)"
+  echo "    notmuch view [-d] [itemno]"
+  echo "      view the referenced thread in your mail client. Add -d to search in done tasks"
   echo ""
   exit
 }
 
+getthread() {
+    sed -n "${1}p" "$target" | grep -Po "notmuch:[^[:blank:]]+" | sed 's/notmuch://'
+}
+
+if [ $# -eq 0 ]; then
+    set -- sync
+fi
+
+
+target=$TODO_FILE
 extra=""
 [ -n "$TODOTXT_NOTMUCH_MAP" ] && extra="-m $TODOTXT_NOTMUCH_MAP"
-notmuch search --format json "$TODOTXT_NOTMUCH_SEARCH" |  $SCRIPTDIR/helpers/notmuch.py -t $TODO_FILE -d $DONE_FILE $extra
+
+case $1 in
+    sync)
+        notmuch search --format json "$TODOTXT_NOTMUCH_SEARCH" |  $SCRIPTDIR/helpers/notmuch.py -t $TODO_FILE -d $DONE_FILE $extra
+        ;;
+    done|do|close|c)
+        shift
+        itemno="$1"
+        if [ -z "$itemno" ]; then
+            echo "Expected item number">&2
+            exit 1
+        fi
+        thread=$(getthread "$itemno")
+        $TODO_FULL_SH done "$itemno"
+        if [ -n "$thread" ]; then 
+            notmuch tag $TODOTXT_NOTMUCH_UNTAG -- "thread:$thread"
+        else
+            echo "No notmuch thread referenced">&2
+            exit 1
+        fi
+        ;;
+    view)
+        shift
+        itemno="$1"
+        if [ -z "$itemno" ]; then
+            echo "Expected item number">&2
+            exit 1
+        fi
+        if [ "$2" = "-d" ]; then
+            target=$DONE_FILE
+        fi
+        thread=$(getthread "$itemno")
+        if [ -n "$thread" ]; then 
+            echo "Running: $TERMINAL_CMD $TODOTXT_NOTMUCH_MAILCMD$thread">&2
+            if ! $TERMINAL_CMD $TODOTXT_NOTMUCH_MAILCMD$thread; then
+                exit $?
+            fi
+        else
+            echo "No notmuch thread referenced">&2
+            exit 1
+        fi
+        ;;
+    *)
+        echo "No such command for todo.sh notmuch: $1">&2
+        exit 1
+        ;;
+esac
+

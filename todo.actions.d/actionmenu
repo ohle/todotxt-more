@@ -12,8 +12,8 @@ shift
   echo "  Action menu:"
   echo "    actionmenu"
   echo "      Shows or processing items for the action menu, not meant to be used directly"
-  echo "    actionmenu [action] [itemno]"
-  echo "      Run the action on the item number"
+  echo "    actionmenu [action] [itemno] [-d]"
+  echo "      Run the action on the item number. Add -d (at the end) to act on done.txt"
   echo ""
   exit
 }
@@ -25,7 +25,7 @@ echo -e "0 - Start task (track in log)
 3 - Decrease priority
 4 - Remove priority
 5 - Edit
-6 - View issue
+6 - View issue/mail
 8 - Print to output
 A - Set priority A
 B - Set priority B
@@ -35,6 +35,11 @@ q - Quit"
 else
     action=$1
     itemno=$2
+    extra=$3
+    if [ -n "$extra" ] && [ "$extra" != "-d" ]; then
+        echo "Third parameter may only be -d, got $extra">&2
+        exit 1
+    fi
 
     if [ -z "$action" ]; then
         echo "No action passed">&2
@@ -46,40 +51,52 @@ else
     fi
 
     case $action in
-        0)
+        0|timetrack)
             echo "Starting timetrack">&2
             $TODO_FULL_SH timetrack start $itemno
             exit 10 #signal for rofi/fzf handler to exit after
             ;;
-        1)
+        1|done)
             echo "Marking as done">&2
-            $TODO_FULL_SH issue done $itemno
+            item="$($TODO_FULL_SH show $itemno)"
+            if echo "$item" | grep -q "issue:"; then
+                $TODO_FULL_SH issue $extra done $itemno
+            elif echo "$item" | grep -q "notmuch:"; then
+                $TODO_FULL_SH notmuch done $itemno
+            else
+                $TODO_FULL_SH done $itemno
+            fi
             exit 10
             ;;
-        2)
+        2|priup)
             echo "Increasing priority">&2
             $TODO_FULL_SH priup $itemno
             ;;
-        3)
+        3|pridown)
             echo "Decreasing priority">&2
             $TODO_FULL_SH pridown $itemno
             ;;
-        4)
+        4|depri)
             echo "Removing priority">&2
             $TODO_FULL_SH depri $itemno
             ;;
-        5)
+        5|edit)
             echo "Running editor">&2
             $TODO_FULL_SH edit $itemno
             exit 10
             ;;
-        6)
-            echo "Viewing issue">&2
-            $TODO_FULL_SH issue $itemno
+        6|view)
+            echo "Viewing issue/mail">&2
+            item="$($TODO_FULL_SH show $extra $itemno)"
+            if echo "$item" | grep -q "issue:"; then
+                $TODO_FULL_SH issue $extra $itemno
+            elif echo "$item" | grep -q "notmuch:"; then
+                $TODO_FULL_SH notmuch view $itemno $extra
+            fi
             exit 10
             ;;
         7)
-            $TODO_FULL_SH format show $itemno
+            $TODO_FULL_SH format show $extra $itemno
             ;;
         A)
             echo "Setting priority">&2
