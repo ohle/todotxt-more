@@ -15,6 +15,8 @@ SCRIPTDIR="$(dirname $0)"
   echo "      Marks an item number as done, takes care of closing the issue or untagging the mail as well"
   echo "    more view [itemno] [[-d]]"
   echo "      View related data (issue/mail). Set the -d parameter to search in done.txt"
+  echo "    more sync"
+  echo "      Run sync on extensions that are syncable"
   echo ""
   exit
 }
@@ -53,6 +55,10 @@ case $1 in
     priup|pridown|fzf|rofi|depri|pri|archive|deduplicate|help|move|mv|issue|notmuch|edit|report|timetrack)
         #no need to invoke these via 'more'
         $TODO_FULL_SH $@
+        ;;
+    sync)
+        $TODO_FULL_SH issue sync
+        $TODO_FULL_SH notmuch sync
         ;;
     done|do)
         shift
