@@ -16,6 +16,7 @@ This is a set of complementary extensions for todo.txt .
 * `notmuch` - Sync with notmuch mail based on tags like 'todo' and/or 'reply' 
  
 The following are usually not called directly:
+
 * `format` - Better coloured output, supports ANSI colours, pango, and html
 * `relsort` -  Better list display with sorting
 * `actionmenu` - The menu used in the fzf and rofi interfaces. 
@@ -24,20 +25,19 @@ The following are usually not called directly:
 
 Run ``make install`` to copy everything to your `~/.todo.actions.d` directory.
 
-You will need the following dependencies to use all the extra functionality this extension set offers:
+You will need the following dependencies to use all the extra functionality this extension offers:
 
+* [todo.txt-cli](https://github.com/todotxt/todo.txt-cli) - The base todo.txt CLI interface, this provides `todo.sh`. (AUR: `todotxt`, Alpine: `todo.txt-cli`, Debian: `todotxt-cli`, Homebrew: `todo.txt`)
 * Python 3.7 or above (the extensions are written in bash but some call additional python scripts)
-* [pygithub](https://github.com/pygithub/pygithub) (Arch: `python-github`, Alpine: `py3-github3`), for `issue`
-* [pytodotxt](https://vonshednob.cc/pytodotxt/) (from pypi), for `issue` and `notmuch`
-* [fzf](https://github.com/junegunn/fzf) (Arch: `fzf`, Alpine: `fzf`), for `fzf`
-* [rofi](https://github.com/davatorium/rofi) (Arch: `rofi` or AUR `rofi-lbonn-wayland` , Alpine: `rofi` or `rofi-wayland`), for `rofi`
-* [notmuch](https://notmuchmail.org/) (Arch: `notmuch`, Alpine: `notmuch`), for `notmuch`
+* [pygithub](https://github.com/pygithub/pygithub) (Arch: `python-github`, Alpine: `py3-github3`, pypi: `pygithub`)
+* [pytodotxt](https://vonshednob.cc/pytodotxt/) (pypi: `pytodotxt`)
+* [fzf](https://github.com/junegunn/fzf) (Arch/Alpine/Debian/Homebrew: `fzf`)
+* [rofi](https://github.com/davatorium/rofi) (Arch/Debian/Alpino: `rofi`, alterantive AUR `rofi-lbonn-wayland` , Alpine: `rofi-wayland`)
+* [notmuch](https://notmuchmail.org/) (Arch/Alpine/Debian/Homebrew: `notmuch`)
 
 You can run `make pythondeps` to install the python dependencies locally (uses ``pip install --user``).
 
-
 ## Usage & Workflow
-
 
 This extension set assumes you make use of priorities A, B and C only (and D as a special category). I use them as follows in a kind of kanban-style:
 
