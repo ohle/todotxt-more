@@ -1,0 +1,33 @@
+#!/bin/bash
+
+#install this in the .todo.actions.d folder of your todo.txt CLI install.
+
+action=$1
+shift
+
+SCRIPTDIR="$(dirname $0)"
+
+[ -z "$TODO_ISSUE_OPENER" ] && TODO_ISSUE_OPENER=xdg-open
+
+[ "$action" = "usage" ] && {
+  echo "  iCalendar support:"
+  echo "    ics import [filename]"
+  echo "      imports an ics file. Takes care not to import duplicates. filename may also be - for stdin"
+  echo "    ics export [itemno] .."
+  echo "      export the specified item numbers to ics (to stdout)"
+  echo ""
+  exit
+}
+
+if [ "$1" = "import" ]; then
+    shift
+    filename=$1
+    if [ ! -e "$filename" ]; then
+        echo "no such file to import: $filename"
+    fi
+    cat "$filename" | "$SCRIPTDIR/helpers/icsimport.py" -t "$TODO_FILE" -d "$DONE_FILE"
+elif [ "$1" = "export" ]; then
+    shift
+    "$SCRIPTDIR/helpers/icsexport.py" -t "$TODO_FILE" $@
+fi
+
