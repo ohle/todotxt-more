@@ -14,7 +14,8 @@ This is a set of complementary extensions for todo.txt .
 * `issue` - View and sync issues (sync with Github)
 * `timetrack` - Track time on projects and contexts, and produce summary reports 
 * `notmuch` - Sync with notmuch mail based on tags like 'todo' and/or 'reply' 
-* `ics` - Import iCalendar/vCalendar (ics) files
+* `cal` - Import iCalendar/vCalendar (ics) files
+* `autoprio` - Automatically assign priorities (mostly based on due dates) 
  
 The following are usually not called directly:
 
