@@ -4,7 +4,7 @@
 
 This is a set of complementary extensions for todo.txt .
 
-* `format` - Better coloured output, supports both ANSI colours as well as pango.
+* `format` - Better coloured output, supports ANSI colours, pango, and html
 * `edit` - Invokes editor to edit todo.txt. 
 * `show` - Show a single task based on item number
 * `priup` - Priority up

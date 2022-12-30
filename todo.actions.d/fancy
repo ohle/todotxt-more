@@ -9,14 +9,37 @@ SCRIPTDIR="$(dirname $0)"
 
 [ "$action" = "usage" ] && {
   echo "  Fancy list:"
-  echo "    fancy [actions]"
+  echo "    fancy [[ansi|pango|html|markdown]] [actions]"
   echo "      Shortcut to show a fancy list with relative dates, sorting and ansi colours, can be used with any list action"
   echo ""
   exit
 }
 
+mode=ansi
+case $1 in
+    ansi)
+        shift
+        ;;
+    pango)
+        mode=pango
+        shift
+        ;;
+    html)
+        mode=html
+        shift
+        ;;
+    markdown)
+        mode=markdown
+        shift
+        ;;
+    slack)
+        mode=slack
+        shift
+        ;;
+esac
+
 if [ "$#" -eq 0 ]; then
     set -- list
 fi
 
-$TODO_FULL_SH relsort $@ | $TODO_FULL_SH format ansi stdin
+$TODO_FULL_SH relsort $@ | $TODO_FULL_SH format $mode stdin

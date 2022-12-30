@@ -11,9 +11,9 @@ shift
 
 [ "$action" = "usage" ] && {
   echo "  Format/recolor output:"
-  echo "    format [ansi|pango] [ACTIONS]"
-  echo "      run command and recolor using ansi or pango"
-  echo "    format [ansi|pango] stdin"
+  echo "    format [ansi|pango|html|markdown|slack] [ACTIONS]"
+  echo "      run command and recolor using ansi, pango, html, markdown, or slack's markdown variant"
+  echo "    format [ansi|pango|html|markdown|slack] stdin"
   echo "      reads from standard input"
   echo ""
   exit
@@ -31,6 +31,14 @@ case $1 in
         ;;
     html)
         mode=html
+        shift
+        ;;
+    markdown)
+        mode=markdown
+        shift
+        ;;
+    slack)
+        mode=slack
         shift
         ;;
 esac
@@ -106,6 +114,36 @@ HTML_MARKUP_UPDATED='<span class="updated">\1<\/span>'
 HTML_MARKUP_RELTIME='<span class="reltime">\1<\/span>'
 HTML_MARKUP_DONE='<span class="done">\1<\/span>'
 
+MD_MARKUP_LINENO='`\1`'
+MD_MARKUP_PRIORITY_A='\*\*\1\*\*'
+MD_MARKUP_PRIORITY_B='\*\*\1\*\*'
+MD_MARKUP_PRIORITY_C='\*\*\1\*\*'
+MD_MARKUP_PRIORITY_D='\*\*\1\*\*'
+MD_MARKUP_PROJECT='\*\*\1\*\*'
+MD_MARKUP_CONTEXT='\*\1\*'
+MD_MARKUP_TAG='`\1\`'
+MD_MARKUP_DUE='\1'
+MD_MARKUP_ISSUE='`issue:`\[\1\]\(\1\)'
+MD_MARKUP_NOTMUCH='`\1`'
+MD_MARKUP_UPDATED='`\1`'
+MD_MARKUP_RELTIME='*\1*'
+MD_MARKUP_DONE='~~\1~~'
+
+SLACK_MARKUP_LINENO=''
+SLACK_MARKUP_PRIORITY_A='\*\1\*'
+SLACK_MARKUP_PRIORITY_B='\*\1\*'
+SLACK_MARKUP_PRIORITY_C='\*\1\*'
+SLACK_MARKUP_PRIORITY_D='\*\1\*'
+SLACK_MARKUP_PROJECT='\*\1\*'
+SLACK_MARKUP_CONTEXT='_\1_'
+SLACK_MARKUP_TAG='`\1\`'
+SLACK_MARKUP_DUE='\1'
+SLACK_MARKUP_ISSUE='`issue:`\[\1\]\(\1\)'
+SLACK_MARKUP_NOTMUCH='`\1`'
+SLACK_MARKUP_UPDATED='`\1`'
+SLACK_MARKUP_RELTIME='_\1_'
+SLACK_MARKUP_DONE='~\1~'
+
 
 [ "$mode" == "html" ] && echo "$HTML_HEAD"
 
@@ -120,6 +158,12 @@ if [ "$1" = "stdin" ]; then cat; else todo.sh -p "$@"; fi | while read line; do
                 ;;
             html)
                 echo -e "${line}" | sed -r "s/^([[:digit:]]+ x .*)/${HTML_MARKUP_DONE}/g"
+                ;;
+            markdown)
+                echo -e "${line}" | sed -r "s/^([[:digit:]]+ x .*)/${MD_MARKUP_DONE}/g"
+                ;;
+            slack)
+                echo -e "${line}" | sed -r "s/^([[:digit:]]+ x .*)/${MD_MARKUP_DONE}/g"
                 ;;
         esac
     else
@@ -175,6 +219,42 @@ if [ "$1" = "stdin" ]; then cat; else todo.sh -p "$@"; fi | while read line; do
                     s/((created|updated):[^[:blank:]]*)/${HTML_MARKUP_UPDATED}/g;
                     s/(due\:[0-9T\-]+)/${HTML_MARKUP_DUE}/g"
                 echo "</li>"
+            ;;
+            markdown)
+                echo -n "* "
+                echo -e "${line}" | sed -r "
+                    s/^([[:digit:]]+ x .*)$/${MD_MARKUP_DONE}/g;
+                    s/([[:digit:]]+d) /${MD_MARKUP_RELTIME} /g;
+                    s/^([[:digit:]]+) /${MD_MARKUP_LINENO} /g;
+                    s/(\(A\))/${MD_MARKUP_PRIORITY_A}/g;
+                    s/(\(B\))/${MD_MARKUP_PRIORITY_B}/g;
+                    s/(\(C\))/${MD_MARKUP_PRIORITY_C}/g;
+                    s/(\(D\))/${MD_MARKUP_PRIORITY_D}/g;
+                    s/(\+${WORD_REGEX})/${MD_MARKUP_PROJECT}/g;
+                    s/(\@${WORD_REGEX})/${MD_MARKUP_CONTEXT}/g;
+                    s/(\#${WORD_REGEX})/${MD_MARKUP_TAG}/g;
+                    s/issue:(https?:\/\/[^[:blank:]]*)/${MD_MARKUP_ISSUE}/g;
+                    s/(notmuch:[a-z0-9]+)/${MD_MARKUP_NOTMUCH}/g;
+                    s/((created|updated):[^[:blank:]]*)/${MD_MARKUP_UPDATED}/g;
+                    s/(due\:[0-9T\-]+)/${MD_MARKUP_DUE}/g"
+            ;;
+            slack)
+                echo -n "* "
+                echo -e "${line}" | sed -r "
+                    s/^([[:digit:]]+ x .*)$/${SLACK_MARKUP_DONE}/g;
+                    s/([[:digit:]]+d) /${SLACK_MARKUP_RELTIME} /g;
+                    s/^([[:digit:]]+ )/${SLACK_MARKUP_LINENO}/g;
+                    s/(\(A\))/${SLACK_MARKUP_PRIORITY_A}/g;
+                    s/(\(B\))/${SLACK_MARKUP_PRIORITY_B}/g;
+                    s/(\(C\))/${SLACK_MARKUP_PRIORITY_C}/g;
+                    s/(\(D\))/${SLACK_MARKUP_PRIORITY_D}/g;
+                    s/(\+${WORD_REGEX})/${SLACK_MARKUP_PROJECT}/g;
+                    s/(\@${WORD_REGEX})/${SLACK_MARKUP_CONTEXT}/g;
+                    s/(\#${WORD_REGEX})/${SLACK_MARKUP_TAG}/g;
+                    s/issue:(https?:\/\/[^[:blank:]]*)/${SLACK_MARKUP_ISSUE}/g;
+                    s/(notmuch:[a-z0-9]+)/${SLACK_MARKUP_NOTMUCH}/g;
+                    s/((created|updated):[^[:blank:]]*)/${SLACK_MARKUP_UPDATED}/g;
+                    s/(due\:[0-9T\-]+)/${SLACK_MARKUP_DUE}/g"
             ;;
             *)
                 echo "No such format: $mode">&2
