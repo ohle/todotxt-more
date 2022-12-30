@@ -29,6 +29,10 @@ case $1 in
         mode=pango
         shift
         ;;
+    html)
+        mode=html
+        shift
+        ;;
 esac
 
 PANGO_MARKUP_LINENO='<small><small><span fgcolor="black">\1<\/span><\/small><\/small>'
@@ -39,7 +43,6 @@ PANGO_MARKUP_PRIORITY_D='<b><span fgcolor="blue">\1<\/span><\/b>'
 PANGO_MARKUP_PROJECT='<span fgcolor="darkcyan"><b>\1<\/b><\/span>'
 PANGO_MARKUP_CONTEXT='<span fgcolor="darkmagenta"><b>\1<\/b><\/span>'
 PANGO_MARKUP_TAG='<span fgcolor="darkgreen"><b>\1<\/b><\/span>'
-PANGO_MARKUP_DUE='<span fgcolor="red"><b>\1<\/b><\/span>'
 PANGO_MARKUP_ISSUE='<small><span fgcolor="blue"><b>\1<\/b><\/span><\/small>'
 PANGO_MARKUP_NOTMUCH='<small><span fgcolor="gray"><b>\1<\/b><\/span><\/small>'
 PANGO_MARKUP_UPDATED='<small><span fgcolor="gray"><b>\1<\/b><\/span><\/small>'
@@ -55,13 +58,27 @@ ANSI_MARKUP_PRIORITY_D='\o033[34;1m\1\o033[0m'
 ANSI_MARKUP_PROJECT='\o033[36;1m\1\o033[0m'
 ANSI_MARKUP_CONTEXT='\o033[35;2m\1\o033[0m'
 ANSI_MARKUP_TAG='\o033[32;2m\1\o033[0m'
-ANSI_MARKUP_DUE='\o033[31;1m\1\o033[0m'
 ANSI_MARKUP_ISSUE='\o033[34;2m\1\o033[0m'
 ANSI_MARKUP_NOTMUCH='\o033[37;2m\1\o033[0m'
 ANSI_MARKUP_UPDATED='\o033[37;2m\1\o033[0m'
 ANSI_MARKUP_DUE='\o033[33;1m\1\o033[0m'
 ANSI_MARKUP_RELTIME='\o033[37;2m\1\o033[0m'
 ANSI_MARKUP_DONE='\o033[37;2;9m\1\o033[0m'
+
+HTML_MARKUP_LINENO='<span class="lineno">\1<\/span>'
+HTML_MARKUP_PRIORITY_A='<span class="prioa">\1<\/span>'
+HTML_MARKUP_PRIORITY_B='<span class="priob">\1<\/span>'
+HTML_MARKUP_PRIORITY_C='<span class="prioc">\1<\/span>'
+HTML_MARKUP_PRIORITY_D='<span class="priod">\1<\/span>'
+HTML_MARKUP_PROJECT='<span class="project">\1<\/span>'
+HTML_MARKUP_CONTEXT='<span class="context">\1<\/span>'
+HTML_MARKUP_TAG='<span class="tag">\1<\/span>'
+HTML_MARKUP_DUE='<span class="due">\1<\/span>'
+HTML_MARKUP_ISSUE='<span class="issue">\1<\/span>'
+HTML_MARKUP_NOTMUCH='<span class="notmuch">\1<\/span>'
+HTML_MARKUP_UPDATED='<span class="updated">\1<\/span>'
+HTML_MARKUP_RELTIME='<span class="reltime">\1<\/span>'
+HTML_MARKUP_DONE='<span class="done">\1<\/span>'
 
 
 if [ "$1" = "stdin" ]; then cat; else todo.sh -p "$@"; fi | while read line; do
@@ -88,10 +105,9 @@ if [ "$1" = "stdin" ]; then cat; else todo.sh -p "$@"; fi | while read line; do
                     s/(\@${WORD_REGEX})/${ANSI_MARKUP_CONTEXT}/g;
                     s/(\#${WORD_REGEX})/${ANSI_MARKUP_TAG}/g;
                     s/(issue:https?:\/\/[^[:blank:]]*)/${ANSI_MARKUP_ISSUE}/g;
-                    s/(due:[0-9T:\-]+)/${ANSI_MARKUP_DUE}/g;
                     s/(notmuch:[a-z0-9]+)/${ANSI_MARKUP_NOTMUCH}/g;
                     s/((created|updated):[^[:blank:]]*)/${ANSI_MARKUP_UPDATED}/g;
-                    s/(due\:[0-9\-]+)/${ANSI_MARKUP_DUE}/g"
+                    s/(due\:[0-9T\-]+)/${ANSI_MARKUP_DUE}/g"
             ;;
             pango)
                 echo -e "${line}" | sed -r "
@@ -106,10 +122,26 @@ if [ "$1" = "stdin" ]; then cat; else todo.sh -p "$@"; fi | while read line; do
                     s/(\@${WORD_REGEX})/${PANGO_MARKUP_CONTEXT}/g;
                     s/(\#${WORD_REGEX})/${PANGO_MARKUP_TAG}/g;
                     s/(issue:https?:\/\/[^[:blank:]]*)/${PANGO_MARKUP_ISSUE}/g;
-                    s/(due:[0-9T:\-]+)/${PANGO_MARKUP_DUE}/g;
                     s/(notmuch:[a-z0-9]+)/${PANGO_MARKUP_NOTMUCH}/g;
                     s/((created|updated):[^[:blank:]]*)/${PANGO_MARKUP_UPDATED}/g;
-                    s/(due\:[0-9\-]+)/${PANGO_MARKUP_DUE}/g"
+                    s/(due\:[0-9T\-]+)/${PANGO_MARKUP_DUE}/g"
+            ;;
+            html)
+                echo -e "${line}" | sed -r "
+                    s/^([[:digit:]]+ x .*)$/${HTML_MARKUP_DONE}/g;
+                    s/([[:digit:]]+d )/${HTML_MARKUP_RELTIME}/g;
+                    s/^([[:digit:]]+ )/${HTML_MARKUP_LINENO}/g;
+                    s/(\(A\))/${HTML_MARKUP_PRIORITY_A}/g;
+                    s/(\(B\))/${HTML_MARKUP_PRIORITY_B}/g;
+                    s/(\(C\))/${HTML_MARKUP_PRIORITY_C}/g;
+                    s/(\(D\))/${HTML_MARKUP_PRIORITY_D}/g;
+                    s/(\+${WORD_REGEX})/${HTML_MARKUP_PROJECT}/g;
+                    s/(\@${WORD_REGEX})/${HTML_MARKUP_CONTEXT}/g;
+                    s/(\#${WORD_REGEX})/${HTML_MARKUP_TAG}/g;
+                    s/(issue:https?:\/\/[^[:blank:]]*)/${HTML_MARKUP_ISSUE}/g;
+                    s/(notmuch:[a-z0-9]+)/${HTML_MARKUP_NOTMUCH}/g;
+                    s/((created|updated):[^[:blank:]]*)/${HTML_MARKUP_UPDATED}/g;
+                    s/(due\:[0-9T\-]+)/${HTML_MARKUP_DUE}/g"
             ;;
             *)
                 echo "No such format: $mode">&2
