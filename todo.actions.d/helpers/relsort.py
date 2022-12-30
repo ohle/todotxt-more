@@ -47,13 +47,15 @@ for line in fileinput.input():
                 dt = datetime.datetime(int(fields[i][4:8]), int(fields[i][9:11]), int(fields[i][12:14]))
             days = int((dt.timestamp() - today.timestamp()) / (3600*24))
             if days >= 0:
-                fields.insert(i_orig,"%04dd+" % days)
+                v = "%04dd+" % days
+                fields.insert(i_orig,v)
             else:
-                fields.insert(i_orig,"%04dd" % abs(days))
+                v = "%04dd" % abs(days)
+                fields.insert(i_orig,v)
             if sortkey:
-                sortkey += fields[i]
+                sortkey += v
             else:
-                sortkey = "Y" + fields[i]
+                sortkey = "Y" + v
         elif TAG_DATE.match(fields[i]):
             #creation date
             dt = datetime.datetime(int(fields[i][0:4]), int(fields[i][5:7]), int(fields[i][8:10]))
