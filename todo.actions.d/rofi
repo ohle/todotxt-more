@@ -44,10 +44,10 @@ while true; do
         12)
             $TODO_FULL_SH done "$itemno"
             ;;
-        13)
+        14)
             $TODO_FULL_SH priup "$itemno"
             ;;
-        14)
+        13)
             $TODO_FULL_SH pridown "$itemno"
             ;;
         15)

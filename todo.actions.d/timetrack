@@ -103,7 +103,7 @@ case $action in
             exit 1
         fi
         if echo "$itemno" | grep -qE '^[0-9]+$'; then
-            item=$($TODO_FULL_SH -p show "$itemno" | sed -e 's/(\([A-C]\)) //' | sed -r "s/ updated:[^[:blank:]]+//")
+            item=$($TODO_FULL_SH -p show "$itemno" | sed -e 's/(\([A-D]\)) //' | sed -r "s/ updated:[^[:blank:]]+//")
         else
             item=$itemno
         fi
