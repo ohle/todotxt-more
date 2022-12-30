@@ -14,7 +14,7 @@ This is a set of complementary extensions for todo.txt .
 * `issue` - View and sync issues (sync with Github)
 * `timetrack` - Track time on projects and contexts, and produce summary reports 
 * `notmuch` - Sync with notmuch mail based on tags like 'todo' and/or 'reply' 
-* `fancy` -  Better list display with sorting (`relsort`)
+* `more` -  Better list display with sorting (`relsort`)
  
 The following are usually not called directly:
 * `relsort` -  Better list display with sorting
@@ -49,9 +49,9 @@ This extension set assumes you make use of priorities A, B and C only (and D as 
 
 At any time, there should only be a limited number of items carrying a priority, and it should be easy to increase/decrease priority of a task via either `priup`/`pridown`, or interactively using the `rofi` or `fzf` interfaces.
 
-To display your tasks non-interactively, we recommend you use `todo.sh fancy` (short for `todo.sh fancy list`) rather than the traditional `todo.sh list`. It will invoke the `format` and `relsort` extensions to do better colour highlighting and better relative sorting. You can pass any arguments you pass to `list` to sort by context or project. Here is an example:
+To display your tasks non-interactively, we recommend you use `todo.sh more` (short for `todo.sh more list`) rather than the traditional `todo.sh list`; `todo.sh more` redefines several built-in commands. It will invoke the `format` and `relsort` extensions to do better colour highlighting and better relative sorting. You can pass any arguments you pass to `list` to sort by context or project. Here is an example:
 
-![todo.sh fancy list](doc/fancylist.png)
+![todo.sh more list](doc/morelist.png)
 
 You can note the following in this example:
 
@@ -62,7 +62,7 @@ You can note the following in this example:
 
 If you run `todo.sh fzf list @work`, you'd the see same view, but interactively using fzf, allowing you to do fuzzy search.
 
-![todo.sh fancy list](doc/fzf.png)
+![todo.sh more list](doc/fzf.png)
 
 Or run `todo.sh rofi list @work`, for the same thing in rofi, which opens a graphical menu. This is great to tie to a keybinding in your (tiling?) window manager: 
 
@@ -136,7 +136,7 @@ The `todo.txt notmuch` extension syncs with your notmuch database. It runs a que
 Results when listing may look as follows:
 
 ```
-$ todo.sh fancy list @mail
+$ todo.sh more list @mail
 221 (C) 7d @mail #reply Frog voor MacOS notmuch:00000000000268a8 +frog @huc @work
 225 (C) 13d @mail #reply [PATCH sxmo-utils] Drop busybox aliases notmuch:000000000001a40a +sxmo @hobby
 ```
@@ -202,9 +202,9 @@ Once installed, see `todo.sh help` for complete usage information:
     edit
       Open todo.txt in the editor
 
-  Fancy list:
-    fancy [actions]
-      Shortcut to show a fancy list with relative dates, sorting and ansi colours, can be used with any list action
+  more list:
+    more [actions]
+      Shortcut to show a more list with relative dates, sorting and ansi colours, can be used with any list action
 
   Format/recolor output:
     format [ansi|pango] [ACTIONS]

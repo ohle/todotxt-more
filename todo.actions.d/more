@@ -1,0 +1,98 @@
+#!/bin/bash
+
+#install this in the .todo.actions.d folder of your todo.txt CLI install.
+
+action=$1
+shift
+
+SCRIPTDIR="$(dirname $0)"
+
+[ "$action" = "usage" ] && {
+  echo "  Shortcut redefining various default actions:"
+  echo "    more [[ansi|pango|html|markdown]] list|ls|listall|listcon|listpri|listproj"
+  echo "      Shortcut to show the list with relative dates, sorting and better colour h8ighlighting (can be used with any list action)"
+  echo "    more done [itemno]"
+  echo "      Marks an item number as done, takes care of closing the issue or untagging the mail as well"
+  echo "    more view [itemno] [[-d]]"
+  echo "      View related data (issue/mail). Set the -d parameter to search in done.txt"
+  echo ""
+  exit
+}
+
+mode=ansi
+case $1 in
+    ansi)
+        shift
+        ;;
+    pango)
+        mode=pango
+        shift
+        ;;
+    html)
+        mode=html
+        shift
+        ;;
+    markdown)
+        mode=markdown
+        shift
+        ;;
+    slack)
+        mode=slack
+        shift
+        ;;
+esac
+
+if [ "$#" -eq 0 ]; then
+    set -- list
+fi
+
+case $1 in
+    list|ls|lsa|listall|listpri|lsp|listproj|lsprj|listcon|lsc)
+        $TODO_FULL_SH relsort $@ | $TODO_FULL_SH format $mode stdin
+        ;;
+    priup|pridown|fzf|rofi|depri|pri|archive|deduplicate|help|move|mv|issue|notmuch|edit|report|timetrack)
+        #no need to invoke these via 'more'
+        $TODO_FULL_SH $@
+        ;;
+    done|do)
+        shift
+        itemno=$1
+        if [ -z "$itemno" ]; then
+            echo "No item number passed">&2
+            exit 1
+        fi
+        item="$($TODO_FULL_SH show $itemno)"
+        if echo "$item" | grep -q "issue:"; then
+            $TODO_FULL_SH issue $extra done $itemno
+        elif echo "$item" | grep -q "notmuch:"; then
+            $TODO_FULL_SH notmuch done $itemno
+        else
+            $TODO_FULL_SH done $itemno
+        fi
+        ;;
+    view|v)
+        shift
+        itemno=$1
+        if [ -z "$itemno" ]; then
+            echo "No item number passed">&2
+            exit 1
+        fi
+        extra=$2
+        if [ -n "$extra" ] && [ "$extra" != "-d" ]; then
+            echo "Extra parameter may only be -d, got $extra">&2
+            exit 1
+        fi
+        item="$($TODO_FULL_SH show $extra $itemno)"
+        if echo "$item" | grep -q "issue:"; then
+            $TODO_FULL_SH issue $extra $itemno
+        elif echo "$item" | grep -q "notmuch:"; then
+            $TODO_FULL_SH notmuch view $itemno $extra
+        else
+            echo "Nothing to view">&2
+        fi
+        ;;
+    *)
+        echo "No such action: $1">&2
+        exit 1
+        ;;
+esac

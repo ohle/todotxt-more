@@ -58,14 +58,7 @@ else
             ;;
         1|done)
             echo "Marking as done">&2
-            item="$($TODO_FULL_SH show $itemno)"
-            if echo "$item" | grep -q "issue:"; then
-                $TODO_FULL_SH issue $extra done $itemno
-            elif echo "$item" | grep -q "notmuch:"; then
-                $TODO_FULL_SH notmuch done $itemno
-            else
-                $TODO_FULL_SH done $itemno
-            fi
+            $TODO_FULL_SH more done $itemno
             exit 10
             ;;
         2|priup)
@@ -87,12 +80,7 @@ else
             ;;
         6|view)
             echo "Viewing issue/mail">&2
-            item="$($TODO_FULL_SH show $extra $itemno)"
-            if echo "$item" | grep -q "issue:"; then
-                $TODO_FULL_SH issue $extra $itemno
-            elif echo "$item" | grep -q "notmuch:"; then
-                $TODO_FULL_SH notmuch view $itemno $extra
-            fi
+            $TODO_FULL_SH more view $itemno $extra
             exit 10
             ;;
         7)
