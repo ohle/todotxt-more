@@ -196,6 +196,15 @@ Be aware that the contexts and projects used in aggregation are not mutually exc
 
 Similarly, there is a `weeksummary` and `monthsummary` that aggregates per week/month. You may add the `-all` parameter to see individual tasks again (rather than just contexts and projects).
 
+### Calendar
+
+There is a fair degree of overlap between todo lists and calendars, even though they are distinct perspectives on your time planning. Todo.txt traditionally caters towards todo lists  and not calendars, due dates are not in the initial design but can be easily using a `due` attribute, as many other implementations also do. Todo.txt-more follows this convention and takes `due` dates into account when sorting (`relsort`) and highlighting.
+
+This opens up the road to expressing calendar items in `todo.txt`. The `cal` extension allows importing iCalendar (ics) format via `todo.sh cal import`. 
+
+Similarly, you can export todo items to iCalendar format using `todo.sh cal export`.
+
+
 ### Further usage
 
 Once installed, see `todo.sh help` for complete usage information:
