@@ -65,6 +65,32 @@ ANSI_MARKUP_DUE='\o033[33;1m\1\o033[0m'
 ANSI_MARKUP_RELTIME='\o033[37;2m\1\o033[0m'
 ANSI_MARKUP_DONE='\o033[37;2;9m\1\o033[0m'
 
+HTML_HEAD="<html>
+<head>
+ <meta content=\"text/html; charset=utf-8\" http-equiv=\"content-type\"/>
+</head>
+<style type=\"text/css\">
+body { background: white; font-family: sans-serif; font-size: 12px; }
+.lineno { color: darkgray; font-family: monospace; }
+.prioa { color: red; font-weight: bold; }
+.priob { color: orange; font-weight: bold; }
+.prioc { color: darkgoldenrod; font-weight: bold;  }
+.priod { color: blue; font-weight: bold;  }
+.project { color: darkcyan; font-weight: bold;  }
+.context { color: darkmagenta; }
+.tag { color: darkgreen; }
+.issue { color: blue; }
+.notmuch { color: darkgray; }
+.updated { color: darkgray; }
+.due { color: darkgoldenrod; }
+.reltime { color: dimgray; }
+.done { color: dimgray; }
+</style>
+<body>
+<ul>"
+
+HTML_FOOT="</ul></body></html>"
+
 HTML_MARKUP_LINENO='<span class="lineno">\1<\/span>'
 HTML_MARKUP_PRIORITY_A='<span class="prioa">\1<\/span>'
 HTML_MARKUP_PRIORITY_B='<span class="priob">\1<\/span>'
@@ -74,12 +100,14 @@ HTML_MARKUP_PROJECT='<span class="project">\1<\/span>'
 HTML_MARKUP_CONTEXT='<span class="context">\1<\/span>'
 HTML_MARKUP_TAG='<span class="tag">\1<\/span>'
 HTML_MARKUP_DUE='<span class="due">\1<\/span>'
-HTML_MARKUP_ISSUE='<span class="issue">\1<\/span>'
+HTML_MARKUP_ISSUE='<span class="issue">issue:<a href="\1">\1<\/a><\/span>'
 HTML_MARKUP_NOTMUCH='<span class="notmuch">\1<\/span>'
 HTML_MARKUP_UPDATED='<span class="updated">\1<\/span>'
 HTML_MARKUP_RELTIME='<span class="reltime">\1<\/span>'
 HTML_MARKUP_DONE='<span class="done">\1<\/span>'
 
+
+[ "$mode" == "html" ] && echo "$HTML_HEAD"
 
 if [ "$1" = "stdin" ]; then cat; else todo.sh -p "$@"; fi | while read line; do
     if echo "$line" | grep -qE "^[[:digit:]]+ x .*"; then
@@ -89,6 +117,9 @@ if [ "$1" = "stdin" ]; then cat; else todo.sh -p "$@"; fi | while read line; do
                 ;;
             pango)
                 echo -e "${line}" | sed -r "s/^([[:digit:]]+ x .*)/${PANGO_MARKUP_DONE}/g"
+                ;;
+            html)
+                echo -e "${line}" | sed -r "s/^([[:digit:]]+ x .*)/${HTML_MARKUP_DONE}/g"
                 ;;
         esac
     else
@@ -127,6 +158,7 @@ if [ "$1" = "stdin" ]; then cat; else todo.sh -p "$@"; fi | while read line; do
                     s/(due\:[0-9T\-]+)/${PANGO_MARKUP_DUE}/g"
             ;;
             html)
+                echo "<li>"
                 echo -e "${line}" | sed -r "
                     s/^([[:digit:]]+ x .*)$/${HTML_MARKUP_DONE}/g;
                     s/([[:digit:]]+d )/${HTML_MARKUP_RELTIME}/g;
@@ -138,13 +170,16 @@ if [ "$1" = "stdin" ]; then cat; else todo.sh -p "$@"; fi | while read line; do
                     s/(\+${WORD_REGEX})/${HTML_MARKUP_PROJECT}/g;
                     s/(\@${WORD_REGEX})/${HTML_MARKUP_CONTEXT}/g;
                     s/(\#${WORD_REGEX})/${HTML_MARKUP_TAG}/g;
-                    s/(issue:https?:\/\/[^[:blank:]]*)/${HTML_MARKUP_ISSUE}/g;
+                    s/issue:(https?:\/\/[^[:blank:]]*)/${HTML_MARKUP_ISSUE}/g;
                     s/(notmuch:[a-z0-9]+)/${HTML_MARKUP_NOTMUCH}/g;
                     s/((created|updated):[^[:blank:]]*)/${HTML_MARKUP_UPDATED}/g;
                     s/(due\:[0-9T\-]+)/${HTML_MARKUP_DUE}/g"
+                echo "</li>"
             ;;
             *)
                 echo "No such format: $mode">&2
         esac
     fi
 done
+
+[ "$mode" == "html" ] && echo "$HTML_FOOT"
