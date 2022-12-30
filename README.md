@@ -19,7 +19,7 @@ This is a set of complementary extensions for todo.txt .
 The following are usually not called directly:
 
 * `format` - Better coloured output, supports ANSI colours, pango, and html
-* `relsort` -  Better list display with sorting
+* `relsort` -  Better sorting with relative dates
 * `actionmenu` - The menu used in the fzf and rofi interfaces. 
 
 ## Installation
@@ -59,6 +59,7 @@ You can note the following in this example:
 * todo.txt-more adds hashtags (starting with #) and will colour them differently (`todo.sh format`), context (`@`) and projects (`+`) will also get a distinctive colour.
 * tasks with priority will always be shown before any items without priority (`todo.sh relsort`)
 * tasks with a creation date will be shown using their relative date in days (e.g. 6d) , and sorted accordingly.
+    * though not shown in this example, tasks with a due date (`due:` attribute) will be shown using their relative date in days (e.g. 6d+), and sorted accordingly, this takes precedence over creation date.
 * you see tasks synced from the GitHub (issue) and from my mail (notmuch), more about this later...
 
 Between the `more` and `lists` actions, you can inject the format you want for the output and the colouring.

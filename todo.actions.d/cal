@@ -10,10 +10,10 @@ SCRIPTDIR="$(dirname $0)"
 [ -z "$TODO_ISSUE_OPENER" ] && TODO_ISSUE_OPENER=xdg-open
 
 [ "$action" = "usage" ] && {
-  echo "  iCalendar support:"
-  echo "    ics import [filename]"
+  echo "  calendar support:"
+  echo "    cal import [filename]"
   echo "      imports an ics file. Takes care not to import duplicates. filename may also be - for stdin"
-  echo "    ics export [itemno] .."
+  echo "    cal export [itemno] .."
   echo "      export the specified item numbers to ics (to stdout)"
   echo ""
   exit

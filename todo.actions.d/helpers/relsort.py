@@ -36,7 +36,26 @@ for line in fileinput.input():
             sortkey = "D"
             i += 1
     if len(fields) > i:
-        if TAG_DATE.match(fields[i]):
+        hasdue = [ j for j,x in enumerate(fields[0:]) if x.startswith("due:") ]
+        if hasdue:
+            #due dates take precedence over creation dates
+            i_orig = i
+            i = hasdue[0] 
+            if len(fields[i]) > 14:
+                dt = datetime.datetime(int(fields[i][4:8]), int(fields[i][9:11]), int(fields[i][12:14]), int(fields[i][15:17]),int(fields[i][18:20]),int(fields[i][21:23]))
+            else:
+                dt = datetime.datetime(int(fields[i][4:8]), int(fields[i][9:11]), int(fields[i][12:14]))
+            days = int((dt.timestamp() - today.timestamp()) / (3600*24))
+            if days >= 0:
+                fields.insert(i_orig,"%04dd+" % days)
+            else:
+                fields.insert(i_orig,"%04dd" % abs(days))
+            if sortkey:
+                sortkey += fields[i]
+            else:
+                sortkey = "Y" + fields[i]
+        elif TAG_DATE.match(fields[i]):
+            #creation date
             dt = datetime.datetime(int(fields[i][0:4]), int(fields[i][5:7]), int(fields[i][8:10]))
             days = int((today.timestamp() - dt.timestamp()) / (3600*24))
             fields[i] = "%04dd" % days

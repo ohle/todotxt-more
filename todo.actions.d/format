@@ -179,7 +179,7 @@ if [ "$1" = "stdin" ]; then cat; else todo.sh -p "$@"; fi | while read line; do
             ansi)
                 echo -e "${line}" | sed -r "
                     s/^([[:digit:]]+ )/${ANSI_MARKUP_LINENO}/g;
-                    s/([[:digit:]]+d )/${ANSI_MARKUP_RELTIME}/g;
+                    s/([[:digit:]]+d\+? )/${ANSI_MARKUP_RELTIME}/g;
                     s/(\(A\))/${ANSI_MARKUP_PRIORITY_A}/g;
                     s/(\(B\))/${ANSI_MARKUP_PRIORITY_B}/g;
                     s/(\(C\))/${ANSI_MARKUP_PRIORITY_C}/g;
@@ -196,7 +196,7 @@ if [ "$1" = "stdin" ]; then cat; else todo.sh -p "$@"; fi | while read line; do
             pango)
                 echo -e "${line}" | sed -r "
                     s/^([[:digit:]]+ x .*)$/${PANGO_MARKUP_DONE}/g;
-                    s/([[:digit:]]+d )/${PANGO_MARKUP_RELTIME}/g;
+                    s/([[:digit:]]+d\+? )/${PANGO_MARKUP_RELTIME}/g;
                     s/^([[:digit:]]+ )/${PANGO_MARKUP_LINENO}/g;
                     s/(\(A\))/${PANGO_MARKUP_PRIORITY_A}/g;
                     s/(\(B\))/${PANGO_MARKUP_PRIORITY_B}/g;
@@ -215,7 +215,7 @@ if [ "$1" = "stdin" ]; then cat; else todo.sh -p "$@"; fi | while read line; do
                 echo "<li>"
                 echo -e "${line}" | sed -r "
                     s/^([[:digit:]]+ x .*)$/${HTML_MARKUP_DONE}/g;
-                    s/([[:digit:]]+d )/${HTML_MARKUP_RELTIME}/g;
+                    s/([[:digit:]]+d\+? )/${HTML_MARKUP_RELTIME}/g;
                     s/^([[:digit:]]+ )/${HTML_MARKUP_LINENO}/g;
                     s/(\(A\))/${HTML_MARKUP_PRIORITY_A}/g;
                     s/(\(B\))/${HTML_MARKUP_PRIORITY_B}/g;
@@ -235,7 +235,7 @@ if [ "$1" = "stdin" ]; then cat; else todo.sh -p "$@"; fi | while read line; do
                 echo -n "* "
                 echo -e "${line}" | sed -r "
                     s/^([[:digit:]]+ x .*)$/${MD_MARKUP_DONE}/g;
-                    s/([[:digit:]]+d) /${MD_MARKUP_RELTIME} /g;
+                    s/([[:digit:]]+d\+?) /${MD_MARKUP_RELTIME} /g;
                     s/^([[:digit:]]+) /${MD_MARKUP_LINENO} /g;
                     s/(\(A\))/${MD_MARKUP_PRIORITY_A}/g;
                     s/(\(B\))/${MD_MARKUP_PRIORITY_B}/g;
@@ -254,7 +254,7 @@ if [ "$1" = "stdin" ]; then cat; else todo.sh -p "$@"; fi | while read line; do
                 echo -n "* "
                 echo -e "${line}" | sed -r "
                     s/^([[:digit:]]+ x .*)$/${SLACK_MARKUP_DONE}/g;
-                    s/([[:digit:]]+d) /${SLACK_MARKUP_RELTIME} /g;
+                    s/([[:digit:]]+d\+?) /${SLACK_MARKUP_RELTIME} /g;
                     s/^([[:digit:]]+ )/${SLACK_MARKUP_LINENO}/g;
                     s/(\(A\))/${SLACK_MARKUP_PRIORITY_A}/g;
                     s/(\(B\))/${SLACK_MARKUP_PRIORITY_B}/g;
