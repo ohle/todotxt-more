@@ -324,3 +324,9 @@ Once installed, see `todo.sh help` for complete usage information:
       Shows a time spent summary, aggregated per month, over the specified years
 
 ```
+
+## Contribute
+
+If you want to contribute, you can send patches to my [public inbox](mailto:~proycon/public-inbox@lists.sr.ht). Read about [the git e-mail workflow](https://git-send-email.io/) if you are not yet familiar with it.
+
+The code is currently in a fairly early stage of development and needs further testing and cleanup.
