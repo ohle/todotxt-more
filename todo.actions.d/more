@@ -52,7 +52,7 @@ case $1 in
     list|ls|lsa|listall|listpri|lsp|listproj|lsprj|listcon|lsc)
         $TODO_FULL_SH relsort $@ | $TODO_FULL_SH format $mode stdin
         ;;
-    priup|pridown|fzf|rofi|depri|pri|archive|deduplicate|help|move|mv|issue|notmuch|edit|report|timetrack)
+    priup|pridown|fzf|rofi|depri|pri|archive|deduplicate|help|move|mv|issue|notmuch|edit|report|timetrack|autoprio|cal)
         #no need to invoke these via 'more'
         $TODO_FULL_SH $@
         ;;

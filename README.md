@@ -169,7 +169,7 @@ Of course all this is also available via the action menu offered by the rofi/fzf
 
 ### Time tracking
 
-Employers often require you to track your working hours, especially if you are working on a variety of distinct projects. Keeping track of this manually is a waste of time. If you have your `todo.txt` workflow in place, we can simply take advantage of this for tracking time as well. This is done using `todo.txt timetrack` and it can be invoked interactively via the action menu as presented by fzf or rofi. When you say *start task* a simply eentry of the full task line, prepended with the current date and time, is registered to a file `timetrack.txt` that lives alongside your `todo.txt` and `done.txt`. Only one task can be tracked at any given time (people suck at multitasking anyway, so better not pretend you can do it). When you start a new task the previous one ends. There is also `todo.sh timetrack stop` to stop tracking, which will simply register an *idle* entry in `timetrack.txt`. I recommend to automatically trigger this action when your screensaver/screenlock kicks in so you don't have to worry about it.
+Employers often require you to track your working hours, especially if you are working on a variety of distinct projects. Keeping track of this manually is a waste of time. If you have your `todo.txt` workflow in place, we can simply take advantage of this for tracking time as well. This is done using `todo.txt timetrack` and it can be invoked interactively via the action menu as presented by fzf or rofi. When you say *start task* a simply eentry of the full task line, prepended with the current date and time, is registered to a file `timetrack.txt` that lives alongside your `todo.txt` and `done.txt`. Only one task can be tracked at any given time (people suck at multitasking anyway, so better not pretend you can do it). When you start a new task the previous one ends. There is also `todo.sh timetrack stop` to stop tracking, which will simply register an *idle* entry in `timetrack.txt`. I recommend to automatically trigger this action when your screensaver/screenlock kicks in so you don't have to worry about it. The tracking will also be stopped automatically if you mark the currently tracked task as done via `todo.sh more done` or fzf/rofi.
 
 To see the task you are currently working on, run `todo.sh timetrack current`. This may be worth adding to whatever bar (waybar/polybar/dwm's bar/etc) you use so you can see it at all times.
 
@@ -205,8 +205,18 @@ Once installed, see `todo.sh help` for complete usage information:
   Action menu:
     actionmenu
       Shows or processing items for the action menu, not meant to be used directly
-    actionmenu [action] [itemno]
-      Run the action on the item number
+    actionmenu [action] [itemno] [-d]
+      Run the action on the item number. Add -d (at the end) to act on done.txt
+
+  Auto prioritisation:
+    autoprio
+      automatically assign priorities where possible
+
+  calendar support:
+    cal import [filename]
+      imports an ics file. Takes care not to import duplicates. filename may also be - for stdin
+    cal export [itemno] ..
+      export the specified item numbers to ics (to stdout)
 
   Edit:
     edit [[itemno]]
@@ -214,14 +224,10 @@ Once installed, see `todo.sh help` for complete usage information:
     edit
       Open todo.txt in the editor
 
-  more list:
-    more [actions]
-      Shortcut to show a more list with relative dates, sorting and ansi colours, can be used with any list action
-
   Format/recolor output:
-    format [ansi|pango] [ACTIONS]
-      run command and recolor using ansi or pango
-    format [ansi|pango] stdin
+    format [ansi|pango|html|markdown|slack] [ACTIONS]
+      run command and recolor using ansi, pango, html, markdown, or slack's markdown variant
+    format [ansi|pango|html|markdown|slack] stdin
       reads from standard input
 
   Fuzzy search:
@@ -236,9 +242,23 @@ Once installed, see `todo.sh help` for complete usage information:
     issue close|done [itemno] ...
       close the reference issue (and mark the item as a whole as done)
 
-  Handle linked issues:
-    notmuch
+  Shortcut redefining various default actions:
+    more [[ansi|pango|html|markdown]] list|ls|listall|listcon|listpri|listproj
+      Shortcut to show the list with relative dates, sorting and better colour h8ighlighting (can be used with any list action)
+    more done [itemno]
+      Marks an item number as done, takes care of closing the issue or untagging the mail as well
+    more view [itemno] [[-d]]
+      View related data (issue/mail). Set the -d parameter to search in done.txt
+    more sync
+      Run sync on extensions that are syncable
+
+  Handle linked mails:
+    notmuch sync
       sync notmuch mails by query: tag:todo or tag:reply
+    notmuch done [itemno]
+      mark the task and the corresponding mail as done (-todo -reply -inbox)
+    notmuch view [-d] [itemno]
+      view the referenced thread in your mail client. Add -d to search in done tasks
 
   Priority changing:
     pridown [itemno]
