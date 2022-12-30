@@ -68,6 +68,11 @@ case $1 in
             exit 1
         fi
         item="$($TODO_FULL_SH show $itemno)"
+        itemtest=$($TODO_FULL_SH -p show "$itemno" | sed -e 's/(\([A-D]\)) //' | sed -r "s/ updated:[^[:blank:]]+//")
+        if [ "$($TODO_FULL_SH timetrack current | cut -d" " -f 3-)" = "$itemtest" ]; then
+            #this is the currently tracked item, stop tracking it
+            $TODO_FULL_SH timetrack stop
+        fi
         if echo "$item" | grep -q "issue:"; then
             $TODO_FULL_SH issue $extra done $itemno
         elif echo "$item" | grep -q "notmuch:"; then
