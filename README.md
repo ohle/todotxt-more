@@ -4,7 +4,7 @@
 
 This is a set of complementary extensions for todo.txt .
 
-* `format` - Better coloured output, supports ANSI colours, pango, and html
+* `more` -  Main entry point, shortcut invoking various underlying plugins. By default displays a list with better sorting (`relsort`) and colour highlighting (`format`)
 * `edit` - Invokes editor to edit todo.txt. 
 * `show` - Show a single task based on item number
 * `priup` - Priority up
@@ -14,9 +14,9 @@ This is a set of complementary extensions for todo.txt .
 * `issue` - View and sync issues (sync with Github)
 * `timetrack` - Track time on projects and contexts, and produce summary reports 
 * `notmuch` - Sync with notmuch mail based on tags like 'todo' and/or 'reply' 
-* `more` -  Better list display with sorting (`relsort`)
  
 The following are usually not called directly:
+* `format` - Better coloured output, supports ANSI colours, pango, and html
 * `relsort` -  Better list display with sorting
 * `actionmenu` - The menu used in the fzf and rofi interfaces. 
 
@@ -49,7 +49,7 @@ This extension set assumes you make use of priorities A, B and C only (and D as 
 
 At any time, there should only be a limited number of items carrying a priority, and it should be easy to increase/decrease priority of a task via either `priup`/`pridown`, or interactively using the `rofi` or `fzf` interfaces.
 
-To display your tasks non-interactively, we recommend you use `todo.sh more` (short for `todo.sh more list`) rather than the traditional `todo.sh list`; `todo.sh more` redefines several built-in commands. It will invoke the `format` and `relsort` extensions to do better colour highlighting and better relative sorting. You can pass any arguments you pass to `list` to sort by context or project. Here is an example:
+To display your tasks non-interactively, we recommend you use `todo.sh more` (short for `todo.sh more list`) rather than the traditional `todo.sh list`; `todo.sh more` redefines several built-in commands. It will invoke the `format` and `relsort` extensions to do better colour highlighting and better relative sorting. You can pass any actions you also pass to `todo.sh`. Here is an example:
 
 ![todo.sh more list](doc/morelist.png)
 
@@ -60,7 +60,16 @@ You can note the following in this example:
 * tasks with a creation date will be shown using their relative date in days (e.g. 6d) , and sorted accordingly.
 * you see tasks synced from the GitHub (issue) and from my mail (notmuch), more about this later...
 
-If you run `todo.sh fzf list @work`, you'd the see same view, but interactively using fzf, allowing you to do fuzzy search.
+Between the `more` and `lists` actions, you can inject the format you want for the output and the colouring.
+
+* `ansi` - ANSI escape sequences, good for terminals, this is the default
+* `pango` - Pango markup, good when used with GUI applications like rofi, dmenu with pango patch, [wayout](https://git.sr.ht/~proycon/wayout)
+* `html` - HTML, good for exporting to the web
+* `markdown` - Markdown syntax 
+* `slack` - Slack's butchered version of markdown syntax, good for pasting into Slack.
+
+You might, however, prefer a more interactive view that allows you to do fuzzy search and makes the tasks directly actionable.
+If you run `todo.sh fzf list @work`, you'd the see same view as the static one, but interactively using fzf:
 
 ![todo.sh more list](doc/fzf.png)
 
