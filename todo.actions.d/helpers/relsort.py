@@ -51,6 +51,7 @@ for line in fileinput.input():
                 fields.insert(i_orig,v)
             else:
                 v = "%04dd" % abs(days)
+                fields[i] = "over" + fields[i] #overdue!
                 fields.insert(i_orig,v)
             if sortkey:
                 sortkey += v

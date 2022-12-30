@@ -55,7 +55,8 @@ PANGO_MARKUP_ISSUE='<small><span fgcolor="blue"><b>\1<\/b><\/span><\/small>'
 PANGO_MARKUP_NOTMUCH='<small><span fgcolor="gray"><b>\1<\/b><\/span><\/small>'
 PANGO_MARKUP_UPDATED='<small><span fgcolor="gray"><b>\1<\/b><\/span><\/small>'
 PANGO_MARKUP_DUETODAY='<span fgcolor="red"><b>today<\/b><\/span>'
-PANGO_MARKUP_DUE='<small><span fgcolor="yellow"><b>\1<\/b><\/span><\/small>'
+PANGO_MARKUP_OVERDUE='<small><span fgcolor="red"><b>\1<\/b><\/span><\/small>'
+PANGO_MARKUP_DUE='<small><span fgcolor="lightgreen"><b>\1<\/b><\/span><\/small>'
 PANGO_MARKUP_RELTIME='<span fgcolor="gray"><i>\1<\/i><\/span>'
 PANGO_MARKUP_DONE='<s><span fgcolor="gray">\1<\/span><\/s>'
 
@@ -71,6 +72,7 @@ ANSI_MARKUP_ISSUE='\o033[34;2m\1\o033[0m'
 ANSI_MARKUP_NOTMUCH='\o033[37;2m\1\o033[0m'
 ANSI_MARKUP_UPDATED='\o033[37;2m\1\o033[0m'
 ANSI_MARKUP_DUETODAY='\o033[31;1mdue:today\o033[0m'
+ANSI_MARKUP_OVERDUE='\o033[31;1m\1\o033[0m'
 ANSI_MARKUP_DUE='\o033[33;1m\1\o033[0m'
 ANSI_MARKUP_RELTIME='\o033[37;2m\1\o033[0m'
 ANSI_MARKUP_DONE='\o033[37;2;9m\1\o033[0m'
@@ -81,7 +83,7 @@ HTML_HEAD="<html>
 </head>
 <style type=\"text/css\">
 body { background: white; font-family: sans-serif; font-size: 12px; }
-.lineno { color: darkgray; font-family: monospace; }
+.lineno { color: darkgray; font-family: monospace; font-size: 80%; }
 .prioa { color: red; font-weight: bold; }
 .priob { color: orange; font-weight: bold; }
 .prioc { color: darkgoldenrod; font-weight: bold;  }
@@ -90,11 +92,13 @@ body { background: white; font-family: sans-serif; font-size: 12px; }
 .context { color: darkmagenta; }
 .tag { color: darkgreen; }
 .issue { color: blue; }
-.notmuch { color: darkgray; }
-.updated { color: darkgray; }
+.notmuch { color: darkgray; font-size: 80%;}
+.updated { color: darkgray; font-size: 80%; }
 .duetoday { color: red; font-weight: bold; }
+.overdue { color: red; }
+.overdue .due { color: red; }
 .due { color: darkgoldenrod; }
-.reltime { color: dimgray; }
+.reltime { color: dimgray; font-size: 80%; }
 .done { color: dimgray; }
 </style>
 <body>
@@ -110,6 +114,7 @@ HTML_MARKUP_PRIORITY_D='<span class="priod">\1<\/span>'
 HTML_MARKUP_PROJECT='<span class="project">\1<\/span>'
 HTML_MARKUP_CONTEXT='<span class="context">\1<\/span>'
 HTML_MARKUP_TAG='<span class="tag">\1<\/span>'
+HTML_MARKUP_OVERDUE='<span class="overdue">\1<\/span>'
 HTML_MARKUP_DUE='<span class="due">\1<\/span>'
 HTML_MARKUP_DUETODAY='<span class="duetoday">due:today<\/span>'
 HTML_MARKUP_ISSUE='<span class="issue">issue:<a href="\1">\1<\/a><\/span>'
@@ -126,6 +131,7 @@ MD_MARKUP_PRIORITY_D='\*\*\1\*\*'
 MD_MARKUP_PROJECT='\*\*\1\*\*'
 MD_MARKUP_CONTEXT='\*\1\*'
 MD_MARKUP_TAG='`\1\`'
+MD_MARKUP_OVERDUE='\1 \*(overdue!)\*'
 MD_MARKUP_DUE='\1'
 MD_MARKUP_DUETODAY='\*\*due:today\!\!\*\*'
 MD_MARKUP_ISSUE='`issue:`\[\1\]\(\1\)'
@@ -142,6 +148,7 @@ SLACK_MARKUP_PRIORITY_D='\*\1\*'
 SLACK_MARKUP_PROJECT='\*\1\*'
 SLACK_MARKUP_CONTEXT='_\1_'
 SLACK_MARKUP_TAG='`\1\`'
+SLACK_MARKUP_OVERDUE='\1 \*(overdue!)\*'
 SLACK_MARKUP_DUE='\1'
 SLACK_MARKUP_DUETODAY='\*due:today!\*'
 SLACK_MARKUP_ISSUE='`issue:`\[\1\]\(\1\)'
@@ -191,6 +198,7 @@ if [ "$1" = "stdin" ]; then cat; else todo.sh -p "$@"; fi | while read line; do
                     s/((created|updated|ics|end):[^[:blank:]]*)/${ANSI_MARKUP_UPDATED}/g;
                     s/(\@${WORD_REGEX})/${ANSI_MARKUP_CONTEXT}/g;
                     s/(due\:${TODAY})/${ANSI_MARKUP_DUETODAY}/g;
+                    s/(overdue\:[\:0-9T\-]+)/${ANSI_MARKUP_OVERDUE}/g;
                     s/(due\:[\:0-9T\-]+)/${ANSI_MARKUP_DUE}/g"
             ;;
             pango)
@@ -209,6 +217,7 @@ if [ "$1" = "stdin" ]; then cat; else todo.sh -p "$@"; fi | while read line; do
                     s/((created|updated|ics|end):[^[:blank:]]*)/${PANGO_MARKUP_UPDATED}/g;
                     s/(\@${WORD_REGEX})/${PANGO_MARKUP_CONTEXT}/g;
                     s/(due\:$TODAY)/${PANGO_MARKUP_DUETODAY}/g;
+                    s/(overdue\:[\:0-9T\-]+)/${PANGO_MARKUP_OVERDUE}/g;
                     s/(due\:[\:0-9T\-]+)/${PANGO_MARKUP_DUE}/g"
             ;;
             html)
@@ -228,7 +237,8 @@ if [ "$1" = "stdin" ]; then cat; else todo.sh -p "$@"; fi | while read line; do
                     s/((created|updated|ics|end):[^[:blank:]]*)/${HTML_MARKUP_UPDATED}/g;
                     s/(\@${WORD_REGEX})/${HTML_MARKUP_CONTEXT}/g;
                     s/(due\:$TODAY)/${HTML_MARKUP_DUETODAY}/g;
-                    s/(due\:[\:0-9T\-\:]+)/${HTML_MARKUP_DUE}/g"
+                    s/(overdue\:[\:0-9T\-]+)/${HTML_MARKUP_OVERDUE}/g;
+                    s/(due\:[\:0-9T\-]+)/${HTML_MARKUP_DUE}/g"
                 echo "</li>"
             ;;
             markdown)
@@ -248,6 +258,7 @@ if [ "$1" = "stdin" ]; then cat; else todo.sh -p "$@"; fi | while read line; do
                     s/((created|updated|ics|end):[^[:blank:]]*)/${MD_MARKUP_UPDATED}/g;
                     s/(\@${WORD_REGEX})/${MD_MARKUP_CONTEXT}/g;
                     s/(due\:$TODAY)/${MD_MARKUP_DUETODAY}/g;
+                    s/(overdue\:[\:0-9T\-]+)/${MD_MARKUP_OVERDUE}/g;
                     s/(due\:[\:0-9T\-]+)/${MD_MARKUP_DUE}/g"
             ;;
             slack)
@@ -267,7 +278,8 @@ if [ "$1" = "stdin" ]; then cat; else todo.sh -p "$@"; fi | while read line; do
                     s/(notmuch:[a-z0-9]+)/${SLACK_MARKUP_NOTMUCH}/g;
                     s/((created|updated|ics|end):[^[:blank:]]*)/${SLACK_MARKUP_UPDATED}/g;
                     s/(due\:$TODAY)/${SLACK_MARKUP_DUETODAY}/g;
-                    s/(due\:[\:0-9T\-\:]+)/${SLACK_MARKUP_DUE}/g"
+                    s/(overdue\:[\:0-9T\-]+)/${SLACK_MARKUP_OVERDUE}/g;
+                    s/(due\:[\:0-9T\-]+)/${SLACK_MARKUP_DUE}/g"
             ;;
             *)
                 echo "No such format: $mode">&2
