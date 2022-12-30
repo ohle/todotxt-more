@@ -43,6 +43,7 @@ PANGO_MARKUP_DUE='<span fgcolor="red"><b>\1<\/b><\/span>'
 PANGO_MARKUP_ISSUE='<small><span fgcolor="blue"><b>\1<\/b><\/span><\/small>'
 PANGO_MARKUP_NOTMUCH='<small><span fgcolor="gray"><b>\1<\/b><\/span><\/small>'
 PANGO_MARKUP_UPDATED='<small><span fgcolor="gray"><b>\1<\/b><\/span><\/small>'
+PANGO_MARKUP_DUE='<small><span fgcolor="yellow"><b>\1<\/b><\/span><\/small>'
 PANGO_MARKUP_RELTIME='<span fgcolor="gray"><i>\1<\/i><\/span>'
 PANGO_MARKUP_DONE='<s><span fgcolor="gray">\1<\/span><\/s>'
 
@@ -58,6 +59,7 @@ ANSI_MARKUP_DUE='\o033[31;1m\1\o033[0m'
 ANSI_MARKUP_ISSUE='\o033[34;2m\1\o033[0m'
 ANSI_MARKUP_NOTMUCH='\o033[37;2m\1\o033[0m'
 ANSI_MARKUP_UPDATED='\o033[37;2m\1\o033[0m'
+ANSI_MARKUP_DUE='\o033[33;1m\1\o033[0m'
 ANSI_MARKUP_RELTIME='\o033[37;2m\1\o033[0m'
 ANSI_MARKUP_DONE='\o033[37;2;9m\1\o033[0m'
 
@@ -86,6 +88,7 @@ if [ "$1" = "stdin" ]; then cat; else todo.sh -p "$@"; fi | while read line; do
                     s/(\@${WORD_REGEX})/${ANSI_MARKUP_CONTEXT}/g;
                     s/(\#${WORD_REGEX})/${ANSI_MARKUP_TAG}/g;
                     s/(issue:https?:\/\/[^[:blank:]]*)/${ANSI_MARKUP_ISSUE}/g;
+                    s/(due:[0-9T:\-]+)/${ANSI_MARKUP_DUE}/g;
                     s/(notmuch:[a-z0-9]+)/${ANSI_MARKUP_NOTMUCH}/g;
                     s/((created|updated):[^[:blank:]]*)/${ANSI_MARKUP_UPDATED}/g;
                     s/(due\:[0-9\-]+)/${ANSI_MARKUP_DUE}/g"
@@ -103,6 +106,7 @@ if [ "$1" = "stdin" ]; then cat; else todo.sh -p "$@"; fi | while read line; do
                     s/(\@${WORD_REGEX})/${PANGO_MARKUP_CONTEXT}/g;
                     s/(\#${WORD_REGEX})/${PANGO_MARKUP_TAG}/g;
                     s/(issue:https?:\/\/[^[:blank:]]*)/${PANGO_MARKUP_ISSUE}/g;
+                    s/(due:[0-9T:\-]+)/${PANGO_MARKUP_DUE}/g;
                     s/(notmuch:[a-z0-9]+)/${PANGO_MARKUP_NOTMUCH}/g;
                     s/((created|updated):[^[:blank:]]*)/${PANGO_MARKUP_UPDATED}/g;
                     s/(due\:[0-9\-]+)/${PANGO_MARKUP_DUE}/g"
