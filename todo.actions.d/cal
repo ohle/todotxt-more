@@ -15,9 +15,22 @@ SCRIPTDIR="$(dirname $0)"
   echo "      imports an ics file. Takes care not to import duplicates. filename may also be - for stdin"
   echo "    cal export [itemno] .."
   echo "      export the specified item numbers to ics (to stdout)"
+  echo "    cal list [[--headers|-H]"
+  echo "      list all calendar items, add --headers to output headers (ansi colours only)"
+  echo "    cal"
+  echo "      shortcut for cal list --headers"
   echo ""
   exit
 }
+
+
+getduedate() {
+    echo "$1" | grep -Po "due:\\d\\d\\d\\d-\\d\\d-\\d\\d" | sed 's/due://'
+}
+
+if [ $# -eq 0 ]; then
+    set -- list --headers
+fi
 
 if [ "$1" = "import" ]; then
     shift
@@ -29,5 +42,22 @@ if [ "$1" = "import" ]; then
 elif [ "$1" = "export" ]; then
     shift
     "$SCRIPTDIR/helpers/icsexport.py" -t "$TODO_FILE" $@
+elif [ "$1" = "list" ]; then
+    shift
+    if [ "$1" = "-H" ] || [ "$1" == "--headers" ]; then
+        shift
+        $TODO_FULL_SH more list "@calendar" $@ | sed -r 's/\@calendar//' | while read line; do
+            duedate=$(getduedate "$line")
+            if [ "$duedate" != "$prevduedate" ]; then
+                echo
+                echo -e "\033[32;1m$duedate -- $(date --date="$duedate" +"%A %e %B %Y")\033[0m"
+                echo
+            fi
+            echo -e "$line" | sed -r "s/due:${duedate}T?//g"
+            prevduedate="$duedate"
+        done
+    else
+        $TODO_FULL_SH more list "@calendar" $@ | sed -r 's/\@calendar//'
+    fi
 fi
 

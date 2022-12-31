@@ -212,6 +212,15 @@ This opens up the road to expressing calendar items in `todo.txt`. The `cal` ext
 
 Similarly, you can export todo items to iCalendar format using `todo.sh cal export`.
 
+The `cal` extension also has some specific visualisations via `todo.sh cal list`:
+
+![todo.sh cal list](doc/callist.png)
+
+Add the ``--headers`` parameter for a more verbose view grouped per day.
+
+![todo.sh cal list --headers](doc/callistheaders.png)
+
+The latter is also what you get if you just run `todo.sh cal` without further arguments.
 
 ### Further usage
 
@@ -234,6 +243,10 @@ Once installed, see `todo.sh help` for complete usage information:
       imports an ics file. Takes care not to import duplicates. filename may also be - for stdin
     cal export [itemno] ..
       export the specified item numbers to ics (to stdout)
+    cal list [[--headers|-H]
+      list all calendar items, add --headers to output headers (ansi colours only)
+    cal
+      shortcut for cal list --headers
 
   Edit:
     edit [[itemno]]
