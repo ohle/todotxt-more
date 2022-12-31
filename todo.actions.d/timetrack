@@ -108,9 +108,11 @@ case $action in
             item=$itemno
         fi
         echo "$NOW $item" >> "$TIMETRACK_FILE"
+        [ "$TODOTXT_NOTIFY" = 1 ] && notify-send -a "todo.txt-more" "Task started (tracking)" "$item"
         ;;
     "stop")
         echo "$NOW idle" >> "$TIMETRACK_FILE"
+        [ "$TODOTXT_NOTIFY" = 1 ] && notify-send -a "todo.txt-more" "Task stopped (tracking)"
         ;;
     "current"|"c")
         line=$(tail -n 1 "$TIMETRACK_FILE")

@@ -31,6 +31,10 @@ if [ $# -eq 0 ]; then
     set -- sync
 fi
 
+if ! command -v notmuch; then
+    echo "Notmuch not installed">&2
+    exit 2
+fi
 
 target=$TODO_FILE
 extra=""
@@ -38,7 +42,9 @@ extra=""
 
 case $1 in
     sync)
+        [ "$TODOTXT_NOTIFY" = "1" ] && notify-send -a "todo.txt-more" "Notmuch sync" "Starting..."
         notmuch search --format json "$TODOTXT_NOTMUCH_SEARCH" |  $SCRIPTDIR/helpers/notmuch.py -t $TODO_FILE -d $DONE_FILE $extra
+        [ "$TODOTXT_NOTIFY" = "1" ] && notify-send -a "todo.txt-more" "Notmuch sync" "Finished"
         ;;
     done|do|close|c)
         shift
@@ -48,11 +54,15 @@ case $1 in
             exit 1
         fi
         thread=$(getthread "$itemno")
+        item="$($TODO_FULL_SH show $itemno)"
         $TODO_FULL_SH done "$itemno"
+        [ "$TODOTXT_NOTIFY" = "1" ] && notify-send -a "todo.txt-more" "Task/mail done" "$item"
         if [ -n "$thread" ]; then 
             notmuch tag $TODOTXT_NOTMUCH_UNTAG -- "thread:$thread"
         else
-            echo "No notmuch thread referenced">&2
+            msg="No notmuch thread referenced"
+            echo "$msg">&2
+            [ "$TODOTXT_NOTIFY" = "1" ] && notify-send -a "todo.txt-more" "Error" "$msg"
             exit 1
         fi
         ;;
@@ -69,11 +79,14 @@ case $1 in
         thread=$(getthread "$itemno")
         if [ -n "$thread" ]; then 
             echo "Running: $TERMINAL_CMD $TODOTXT_NOTMUCH_MAILCMD$thread">&2
+            [ "$TODOTXT_NOTIFY" = "1" ] && notify-send -a "todo.txt-more" "Opening mail thread"
             if ! $TERMINAL_CMD $TODOTXT_NOTMUCH_MAILCMD$thread; then
                 exit $?
             fi
         else
-            echo "No notmuch thread referenced">&2
+            msg="No notmuch thread referenced"
+            echo "$msg">&2
+            [ "$TODOTXT_NOTIFY" = "1" ] && notify-send -a "todo.txt-more" "Error" "$msg"
             exit 1
         fi
         ;;

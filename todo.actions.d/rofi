@@ -25,6 +25,7 @@ if [ $# -eq 0 ]; then
 fi
 
 [ -z $TERMINAL_CMD ] && export TERMINAL_CMD="foot -e"
+[ -z $EDITOR ] && export EDITOR="vim"
 [ -z "$TIMETRACK_FILE" ] && TIMETRACK_FILE="$TODO_DIR/timetrack.txt"
 
 itemno=""
@@ -43,7 +44,7 @@ while true; do
             break
             ;;
         12)
-            $TODO_FULL_SH done "$itemno"
+            $TODO_FULL_SH more done "$itemno"
             ;;
         14)
             $TODO_FULL_SH priup "$itemno"
@@ -66,9 +67,11 @@ while true; do
                     break
                 fi
                 sleep 1
-            else
+            elif [ -n "$result" ]; then
                 #add new item
                 $TODO_FULL_SH add "$result"
+                [ "$TODOTXT_NOTIFY" = 1 ] && notify-send -a "todo.txt-more" "Task added" "$result"
+                break
             fi
             ;;
         *)

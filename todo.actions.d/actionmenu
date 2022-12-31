@@ -49,7 +49,6 @@ else
         echo "No item number passed">&2
         exit 1
     fi
-
     case $action in
         0|timetrack)
             echo "Starting timetrack">&2
@@ -72,6 +71,10 @@ else
         4|depri)
             echo "Removing priority">&2
             $TODO_FULL_SH depri $itemno
+            if [ "$TODOTXT_NOTIFY" = 1 ]; then
+                item="$($TODO_FULL_SH show $itemno)"
+                notify-send -a "todo.txt-more" "Task priority removed" "$item"
+            fi
             ;;
         5|edit)
             echo "Running editor">&2

@@ -32,18 +32,27 @@ else
     target=$TODO_FILE
 fi
 
+
 if [ "$1" = "sync" ]; then
     extra=""
+    [ "$TODOTXT_NOTIFY" = "1" ] && notify-send -a "todo.txt-more" "Issue sync" "Starting..."
     [ -n "$TODO_ISSUE_LABELMAP" ] && extra="-l $TODO_ISSUE_LABELMAP"
     [ -n "$TODO_ISSUE_INFERMAP" ] && extra="$extra -i $TODO_ISSUE_INFERMAP"
-    "$SCRIPTDIR/helpers/issuesync.py" -t "$TODO_FILE" -d "$DONE_FILE" $extra
+    if "$SCRIPTDIR/helpers/issuesync.py" -t "$TODO_FILE" -d "$DONE_FILE" $extra; then
+        [ "$TODOTXT_NOTIFY" = "1" ] && notify-send -a "todo.txt-more" "Issue sync" "Done"
+    else
+        msg="Unable to sync issues. Did you set \$GITHUB_TOKEN?"
+        echo "$msg" >&2
+        [ "$TODOTXT_NOTIFY" = "1" ] && notify-send -a "todo.txt-more" "Issue sync" "$msg"
+    fi
 elif [ "$1" = "done" ] || [ "$1" = "do" ] || [ "$1" = "close" ] || [ "$1" = "c" ]; then
     while [ "$#" -gt 0 ] ; do
         itemno=$1
         url=$(geturl $itemno)
         shift
+        item="$($TODO_FULL_SH show $itemno)"
         $TODO_FULL_SH done "$itemno"
-        if echo "$url" | grep -q "github.com"; then
+        if echo "$url" | grep -q "github.com" && [ -n "$GITHUB_TOKEN" ]; then
             curl \
               -X PATCH \
               -H "Accept: application/vnd.github+json" \
@@ -51,6 +60,9 @@ elif [ "$1" = "done" ] || [ "$1" = "do" ] || [ "$1" = "close" ] || [ "$1" = "c" 
               -H "X-GitHub-Api-Version: 2022-11-28" \
               "$(echo "$url" | sed -e 's/https:\/\/github.com\//https:\/\/api.github.com\/repos\//')" \
               -d '{"state":"closed"}'
+            [ "$TODOTXT_NOTIFY" = "1" ] && notify-send -a "todo.txt-more" "Task/issue closed" "$item"
+        else
+            [ "$TODOTXT_NOTIFY" = "1" ] && notify-send -a "todo.txt-more" "Task done (issue untouched)" "$item"
         fi
     done
 else
@@ -58,9 +70,12 @@ else
     itemno=$1
     url=$(geturl "$itemno")
     if [ -n "$url" ]; then
+        [ "$TODOTXT_NOTIFY" = "1" ] && notify-send -a "todo.txt-more" "Opening issue in viewer" "$url"
         $TODO_ISSUE_OPENER "$url"
     else
-        echo "No issue found">&2
+        msg="No issue found"
+        echo "$msg">&2
+        [ "$TODOTXT_NOTIFY" = "1" ] && notify-send -a "todo.txt-more" "Error" "$msg"
     fi
 fi
 

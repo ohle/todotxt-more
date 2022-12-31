@@ -86,6 +86,10 @@ The rofi method binds some shortcuts keys for quick actions like prioritisation 
 
 ![action menu](doc/actionmenu.png)
 
+## Notifications
+
+You can enable feedback via your notification daemon (via `notify-send`) by setting environment variable `TODOTXT_NOTIFY=1`. If set, you will get feedback notifications on various actions.
+
 ### Issue syncing
 
 If you use Github extensively, its issue tracker is likely an important source of information for your todo tasks. However, it's cumbersome to have issues separate from your todo.txt and effectively have two systems you need to check. The `issue` extension should solve this problem. Its job is to sync issues (including pull requests) from github with your todo.txt. It will sync *all issues assigned to you*. 

@@ -24,4 +24,8 @@ while [ "$#" -gt 0 ] ; do
     itemno=$1
     shift
     sed -i -r "${itemno}s/^\(C\)//; ${itemno}s/^\(B\)/(C)/; ${itemno}s/^\(A\)/(B)/" "$target" 
+    if [ "$TODOTXT_NOTIFY" = 1 ]; then
+        item="$($TODO_FULL_SH show $itemno)"
+        notify-send -a "todo.txt-more" "Task priority decreased" "$item"
+    fi
 done

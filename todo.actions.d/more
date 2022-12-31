@@ -79,6 +79,7 @@ case $1 in
             $TODO_FULL_SH notmuch done $itemno
         else
             $TODO_FULL_SH done $itemno
+            [ "$TODOTXT_NOTIFY" = "1" ] && notify-send -a "todo.txt-more" "Task done" "$item"
         fi
         ;;
     view|v)
