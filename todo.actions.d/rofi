@@ -35,7 +35,7 @@ while true; do
     itemno=$(echo "$result" | striptags | grep -Po "\d+ .*$" | cut -d" " -f 1)
     case $ret in
         10)
-            $TODO_FULL_SH add "$result"
+            $TODO_FULL_SH more add "$result"
             $TODO_FULL_SH timetrack start "$result"
             break
             ;;
@@ -69,8 +69,7 @@ while true; do
                 sleep 1
             elif [ -n "$result" ]; then
                 #add new item
-                $TODO_FULL_SH add "$result"
-                [ "$TODOTXT_NOTIFY" = 1 ] && notify-send -a "todo.txt-more" "Task added" "$result"
+                $TODO_FULL_SH more add "$result"
                 break
             fi
             ;;

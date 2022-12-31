@@ -60,6 +60,11 @@ case $1 in
         $TODO_FULL_SH issue sync
         $TODO_FULL_SH notmuch sync
         ;;
+    add|a)
+        shift
+        $TODO_FULL_SH add "$@"
+        [ "$TODOTXT_NOTIFY" = "1" ] && notify-send -a "todo.txt-more" "Added task" "$@"
+        ;;
     done|do)
         shift
         itemno=$1
