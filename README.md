@@ -82,7 +82,7 @@ Or run `todo.sh rofi list @work`, for the same thing in rofi, which opens a grap
 
 Note that your rofi may look different depending on the theme you are using.
 
-The rofi method even binds some shortcuts keys for quick actions like prioritisation and editing. Once you select an item in either rofi or fzf, you're presented with an action menu (`todo.sh actionmenu`)
+The rofi method binds some shortcuts keys for quick actions like prioritisation and editing. Moreover, you can directly add new entries with rofi by just typing the full task entry in the search field and pressing enter. For existing items, once you select an item in either rofi or fzf, you're presented with an action menu (`todo.sh actionmenu`)
 
 ![action menu](doc/actionmenu.png)
 
