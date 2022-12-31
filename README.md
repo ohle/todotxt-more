@@ -51,9 +51,12 @@ This extension set assumes you make use of priorities A, B and C only (and D as 
 
 At any time, there should only be a limited number of items carrying a priority, and it should be easy to increase/decrease priority of a task via either `priup`/`pridown`, or interactively using the `rofi` or `fzf` interfaces.
 
-To display your tasks non-interactively, we recommend you use `todo.sh more` (short for `todo.sh more list`) rather than the traditional `todo.sh list`; `todo.sh more` redefines several built-in commands. It will invoke the `format` and `relsort` extensions to do better colour highlighting and better relative sorting. You can pass any actions you also pass to `todo.sh`. Here is an example:
+To display your tasks non-interactively, we recommend you use `todo.sh more` (short for `todo.sh more list`) rather than the traditional `todo.sh list`; `todo.sh more` redefines several built-in commands. A quick recommended way to use this from your shell is to set an alias `t="todo.sh more"`, you can then do `t list` (or just `t` as a shortcut),`t add`,`t done` etc... All the regular commands as well as the extensions should be available.
+
+Todo.txt-more will invoke the `format` and `relsort` extensions to do better colour highlighting and better relative sorting. You can pass any actions you also pass to `todo.sh`. Here is an example:
 
 ![todo.sh more list](doc/morelist.png)
+
 
 You can note the following in this example:
 
@@ -62,6 +65,7 @@ You can note the following in this example:
 * tasks with a creation date will be shown using their relative date in days (e.g. 6d) , and sorted accordingly.
     * though not shown in this example, tasks with a due date (`due:` attribute) will be shown using their relative date in days (e.g. 6d+), and sorted accordingly, this takes precedence over creation date.
 * you see tasks synced from the GitHub (issue) and from my mail (notmuch), more about this later...
+
 
 Between the `more` and `lists` actions, you can inject the format you want for the output and the colouring.
 
