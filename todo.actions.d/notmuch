@@ -39,6 +39,7 @@ fi
 target=$TODO_FILE
 extra=""
 [ -n "$TODOTXT_NOTMUCH_MAP" ] && extra="-m $TODOTXT_NOTMUCH_MAP"
+[ -n "$TODOTXT_INFERMAP" ] && extra=" -i $TODOTXT_INFERMAP"
 
 case $1 in
     sync)

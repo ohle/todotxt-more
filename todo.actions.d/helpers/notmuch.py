@@ -6,12 +6,14 @@ import json
 import datetime
 from itertools import chain
 import pytodotxt
+from infer import infertags
 
 
 parser = argparse.ArgumentParser(description="Notmuch syncer, reads 'notmuch search --format=json' output from stdin", formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('--todo','-t',type=str, help="todo.txt file", action='store', required=True)
 parser.add_argument('--done','-d',type=str, help="done.txt file", action='store', required=True)
 parser.add_argument('--tagmap','-m',type=str, help="notmuch tag to todo.txt tag map (json)", action='store', required=False)
+parser.add_argument('--infermap','-i',type=str, help="tag inference map (json), infers tags and contexts from projects", action='store', required=False)
 parser.add_argument('--lowprio',type=str, help="notmuch tag used for low priority", action='store', required=False,default="lowpriority")
 parser.add_argument('--highprio',type=str, help="notmuch tag used for high priority", action='store', required=False,default="priority")
 args = parser.parse_args() #parsed arguments can be accessed as attributes
@@ -21,9 +23,13 @@ DONE_FILE = args.done
 
 
 tagmap = {}
+infermap = {}
 if args.tagmap:
     with open(args.tagmap,'r',encoding="utf-8") as f:
         tagmap = json.load(f)
+if args.infermap:
+    with open(args.infermap,'r',encoding='utf-8') as f:
+        infermap = json.load(f)
 
 todo = pytodotxt.TodoTxt(TODO_FILE)
 todo.parse()
@@ -69,6 +75,8 @@ for thread_id, thread in threads.items():
                     if xtag not in added_tags:
                         added_tags.add(xtag)
                         taskline += f" {xtag}"
+        if infermap:
+            taskline = infertags(taskline, infermap)
         task = pytodotxt.Task(taskline)
         todo.add(task)
         print("Added task:", task, file=sys.stderr)
