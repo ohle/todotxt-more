@@ -25,7 +25,7 @@ done.parse()
 found = set()
 for task in chain(todo.tasks,done.tasks):
     if 'ics' in task.attributes:
-        found.add(task.attributes['ics'])
+        found.add(task.attributes['ics'][0])
 
 cal = Calendar(sys.stdin.read())
 for event in chain(cal.events, cal.todos):
