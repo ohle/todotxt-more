@@ -62,7 +62,12 @@ case $1 in
         ;;
     add|a)
         shift
-        $TODO_FULL_SH add "$@"
+        if [ -n "$TODOTXT_INFERMAP" ]; then
+            ITEM=$("$SCRIPTDIR/helpers/infer.py" "$TODOTXT_INFERMAP" "$@")
+        else
+            ITEM="$@"
+        fi
+        $TODO_FULL_SH add "$ITEM"
         [ "$TODOTXT_NOTIFY" = "1" ] && notify-send -a "todo.txt-more" "Added task" "$@"
         ;;
     done|do)

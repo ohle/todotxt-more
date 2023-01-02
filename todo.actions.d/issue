@@ -32,6 +32,8 @@ else
     target=$TODO_FILE
 fi
 
+[ -n "$TODOTXT_INFERMAP" ] && export TODO_ISSUE_INFERMAP="$TODOTXT_INFERMAP"
+
 
 if [ "$1" = "sync" ]; then
     extra=""
