@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import sys
 import json
 #maps projects to tags/contexts/projects, these will be added in addition to the project (rather than replacing it)
@@ -17,4 +18,4 @@ for project in projects:
             if taskline.find(tag) == -1:
                 taskline += f" {tag}"
 
-
+print(taskline)
