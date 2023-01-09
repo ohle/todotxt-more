@@ -191,7 +191,7 @@ case $action in
         done
         ;;
     summary)
-        if [ $1 = "--all" ] || [ "$1" = "-a" ]; then
+        if [ "$1" = "--all" ] || [ "$1" = "-a" ]; then
             extra="--all"
             shift
         else
