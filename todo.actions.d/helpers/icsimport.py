@@ -28,10 +28,12 @@ for task in chain(todo.tasks,done.tasks):
         found.add(task.attributes['ics'][0])
 
 changed = False
+errcode = 1
 cal = Calendar(sys.stdin.read())
 for event in chain(cal.events, cal.todos):
     if event.uid and event.uid in found:
         print(f"Skipping existing UID {event.uid}")
+        errcode = 2
         continue
 
     taskline = ""
@@ -78,4 +80,4 @@ if changed:
             f_out.write(f_in.read())
     sys.exit(0)
 else:
-    sys.exit(1)
+    sys.exit(errcode)
