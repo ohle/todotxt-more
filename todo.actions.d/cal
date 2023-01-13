@@ -11,8 +11,9 @@ SCRIPTDIR="$(dirname $0)"
 
 [ "$action" = "usage" ] && {
   echo "  calendar support:"
-  echo "    cal import [filename]"
+  echo "    cal import [[--edit]] [filename]"
   echo "      imports an ics file. Takes care not to import duplicates. filename may also be - for stdin"
+  echo "      add the -e option if you want to edit the item immediately after adding (to add tags etc)"
   echo "    cal export [itemno] .."
   echo "      export the specified item numbers to ics (to stdout)"
   echo "    cal list [[--headers|-H]"
@@ -33,12 +34,22 @@ if [ $# -eq 0 ]; then
 fi
 
 if [ "$1" = "import" ]; then
+    if [ "$1" = "-e" ] || [ "$1" == "--edit" ]; then
+        shift
+        edit=1
+    else
+        edit=0
+    fi
     shift
     filename=$1
     if [ ! -e "$filename" ]; then
         echo "no such file to import: $filename"
     fi
-    cat "$filename" | "$SCRIPTDIR/helpers/icsimport.py" -t "$TODO_FILE" -d "$DONE_FILE"
+    if cat "$filename" | "$SCRIPTDIR/helpers/icsimport.py" -t "$TODO_FILE" -d "$DONE_FILE"; then
+        item="$(tail -n 1 "$TODO_FILE")"
+        [ "$TODOTXT_NOTIFY" = 1 ] && notify-send -a "todo.txt-more" "Calendar task added" "$item"
+        [ $edit -eq 1 ] && $TODO_FULL_SH edit 999999
+    fi
 elif [ "$1" = "export" ]; then
     shift
     "$SCRIPTDIR/helpers/icsexport.py" -t "$TODO_FILE" $@
