@@ -49,6 +49,8 @@ if [ "$1" = "import" ]; then
         item="$(tail -n 1 "$TODO_FILE")"
         [ "$TODOTXT_NOTIFY" = 1 ] && notify-send -a "todo.txt-more" "Calendar task added" "$item"
         [ $edit -eq 1 ] && $TODO_FULL_SH edit 999999
+    else
+        [ "$TODOTXT_NOTIFY" = 1 ] && notify-send -a "todo.txt-more" "Failed to add calendar item"
     fi
 elif [ "$1" = "export" ]; then
     shift

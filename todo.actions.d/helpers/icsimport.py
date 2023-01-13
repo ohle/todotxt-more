@@ -27,6 +27,7 @@ for task in chain(todo.tasks,done.tasks):
     if 'ics' in task.attributes:
         found.add(task.attributes['ics'][0])
 
+changed = False
 cal = Calendar(sys.stdin.read())
 for event in chain(cal.events, cal.todos):
     if event.uid and event.uid in found:
@@ -66,16 +67,15 @@ for event in chain(cal.events, cal.todos):
     taskline = taskline.strip()
     task = pytodotxt.Task(taskline)
     todo.add(task)
+    changed = True
     print("Added: ", taskline, file=sys.stderr)
 
 #pytodotxt stumbles over symlinks (overwriting them with a new file rather than following them), so we do it this way:
-todo.save(target="/tmp/todo.txt", safe=False)
-with open("/tmp/todo.txt","r",encoding="utf-8") as f_in:
-    with open(TODO_FILE,"w+",encoding="utf-8") as f_out:
-        f_out.write(f_in.read())
-
-
-
-
-
-
+if changed:
+    todo.save(target="/tmp/todo.txt", safe=False)
+    with open("/tmp/todo.txt","r",encoding="utf-8") as f_in:
+        with open(TODO_FILE,"w+",encoding="utf-8") as f_out:
+            f_out.write(f_in.read())
+    sys.exit(0)
+else:
+    sys.exit(1)
