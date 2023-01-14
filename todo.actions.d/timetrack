@@ -108,10 +108,12 @@ case $action in
             item=$itemno
         fi
         echo "$NOW $item" >> "$TIMETRACK_FILE"
+        sed -ie "${itemno}s|^.*$|$item #timetracking|" "$TODO_FILE"
         [ "$TODOTXT_NOTIFY" = 1 ] && notify-send -a "todo.txt-more" "Task started (tracking)" "$item"
         ;;
     "stop")
         echo "$NOW idle" >> "$TIMETRACK_FILE"
+        sed -ie "s/ #timetracking//" "$TODO_FILE"
         [ "$TODOTXT_NOTIFY" = 1 ] && notify-send -a "todo.txt-more" "Task stopped (tracking)"
         ;;
     "current"|"c")

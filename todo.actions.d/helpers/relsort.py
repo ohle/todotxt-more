@@ -21,7 +21,9 @@ for line in fileinput.input():
     if fields[i] in ("TODO:", "--"):
         continue
     sortkey = ""
-    if len(fields) > i:
+    if '#timetracking' in fields:
+        sortkey = '!'
+    elif len(fields) > i:
         #priority
         if fields[i] == "(A)":
             sortkey = "A"
