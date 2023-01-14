@@ -27,6 +27,7 @@ TAG_RE = re.compile(r'(\s+|^)#([^\s]+)')
 def infer_from_project(task: pytodotxt.Task):
     """Infer additional tags based on the project"""
     for project in task.projects:
+        project = project.strip('+')
         if project in INFER_FROM_PROJECT:
             for tag in INFER_FROM_PROJECT[project]:
                 if str(task).find(tag) == -1:
