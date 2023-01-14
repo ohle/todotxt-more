@@ -7,6 +7,9 @@ shift
 
 SCRIPTDIR="$(dirname $0)"
 
+#items with this tag will never be removed from todo.txt to done.txt, they'll only be deprioritised
+[ "$TODOTXT_RECUR_TAG" ] && export TODOTXT_RECUR_TAG="@generic"
+
 [ "$action" = "usage" ] && {
   echo "  Shortcut redefining various default actions:"
   echo "    more [[ansi|pango|html|markdown]] list|ls|listall|listcon|listpri|listproj"
@@ -83,13 +86,18 @@ case $1 in
             #this is the currently tracked item, stop tracking it
             $TODO_FULL_SH timetrack stop
         fi
-        if echo "$item" | grep -q "issue:"; then
-            $TODO_FULL_SH issue $extra done $itemno
-        elif echo "$item" | grep -q "notmuch:"; then
-            $TODO_FULL_SH notmuch done $itemno
+        if echo "$item" | grep -q "$TODOTXT_RECUR_TAG"; then
+            $TODO_FULL_SH depri "$itemno"
+            [ "$TODOTXT_NOTIFY" = "1" ] && notify-send -a "todo.txt-more" "Task done (deprioritised for next time)" "$item"
         else
-            $TODO_FULL_SH done $itemno
-            [ "$TODOTXT_NOTIFY" = "1" ] && notify-send -a "todo.txt-more" "Task done" "$item"
+            if echo "$item" | grep -q "issue:"; then
+                $TODO_FULL_SH issue $extra done $itemno
+            elif echo "$item" | grep -q "notmuch:"; then
+                $TODO_FULL_SH notmuch done $itemno
+            else
+                $TODO_FULL_SH done $itemno
+                [ "$TODOTXT_NOTIFY" = "1" ] && notify-send -a "todo.txt-more" "Task done" "$item"
+            fi
         fi
         ;;
     view|v)
