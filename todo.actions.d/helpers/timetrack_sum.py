@@ -20,7 +20,7 @@ for line in fileinput.input():
     except:
         continue
     for field in fields:
-        if field[0] in ('+','@'):
+        if field and field[0] in ('+','@'):
             counter[field] += duration
     if all:
         counter[" ".join(fields[1:])] += duration
