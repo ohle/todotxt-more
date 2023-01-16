@@ -8,7 +8,7 @@ shift
 SCRIPTDIR="$(dirname $0)"
 
 #items with this tag will never be removed from todo.txt to done.txt, they'll only be deprioritised
-[ "$TODOTXT_RECUR_TAG" ] && export TODOTXT_RECUR_TAG="@generic"
+[ -z "$TODOTXT_RECUR_TAG" ] && export TODOTXT_RECUR_TAG="@generic"
 
 [ "$action" = "usage" ] && {
   echo "  Shortcut redefining various default actions:"
@@ -55,7 +55,7 @@ case $1 in
     list|ls|lsa|listall|listpri|lsp|listproj|lsprj|listcon|lsc)
         $TODO_FULL_SH relsort $@ | $TODO_FULL_SH format $mode stdin
         ;;
-    priup|pridown|fzf|rofi|depri|pri|archive|deduplicate|help|move|mv|issue|notmuch|edit|report|timetrack|autoprio|cal)
+    priup|pridown|fzf|rofi|depri|pri|archive|deduplicate|help|move|mv|issue|notmuch|edit|report|timetrack|autoprio|cal|show)
         #no need to invoke these via 'more'
         $TODO_FULL_SH $@
         ;;
