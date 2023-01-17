@@ -104,8 +104,7 @@ case $action in
         fi
         if echo "$itemno" | grep -qE '^[0-9]+$'; then
             item=$($TODO_FULL_SH -p show "$itemno")
-            strippeditem=$(echo "$item" | sed -e 's/(\([A-D]\)) //' | sed -r 's/^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9
-] //' | sed -r "s/ updated:[^[:blank:]]+//")
+            strippeditem=$(echo "$item" | sed -e 's/(\([A-D]\)) //'  | sed -r "s/ updated:[^[:blank:]]+//")
         else
             strippeditem=$itemno
         fi
