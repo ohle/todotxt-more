@@ -81,7 +81,7 @@ case $1 in
             exit 1
         fi
         item="$($TODO_FULL_SH show $itemno)"
-        itemtest=$($TODO_FULL_SH -p show "$itemno" | sed -e 's/(\([A-D]\)) //' | sed -r "s/ updated:[^[:blank:]]+//")
+        itemtest=$($TODO_FULL_SH -p show "$itemno" | sed -e 's/(\([A-D]\)) //' | sed -r "s/ updated:[^[:blank:]]+//" | sed -E 's/ #timetracking//')
         if [ "$($TODO_FULL_SH timetrack current | cut -d" " -f 3-)" = "$itemtest" ]; then
             #this is the currently tracked item, stop tracking it
             $TODO_FULL_SH timetrack stop
