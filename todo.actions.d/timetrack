@@ -109,16 +109,16 @@ case $action in
             #item is not a number but an entire item
             strippeditem=$itemno
         fi
-        strippeditem="$(echo "$strippeditem" | sed -e 's/^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] //')"
+        strippeditem="$(echo "$strippeditem" | sed -E 's/^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] //')"
         echo "$NOW $strippeditem" >> "$TIMETRACK_FILE"
         if echo "$itemno" | grep -qE '^[0-9]+$'; then
-            sed -ie "${itemno}s|^.*\$|$item #timetracking|" "$TODO_FILE"
+            sed -i -E "${itemno}s|^.*\$|$item #timetracking|" "$TODO_FILE"
         fi
         [ "$TODOTXT_NOTIFY" = 1 ] && notify-send -a "todo.txt-more" "Task started (tracking)" "$item"
         ;;
     "stop")
         echo "$NOW idle" >> "$TIMETRACK_FILE"
-        sed -ie "s/ #timetracking//" "$TODO_FILE"
+        sed -i -E "s/ #timetracking//" "$TODO_FILE"
         [ "$TODOTXT_NOTIFY" = 1 ] && notify-send -a "todo.txt-more" "Task stopped (tracking)"
         ;;
     "current"|"c")
