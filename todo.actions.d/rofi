@@ -37,8 +37,10 @@ while true; do
         10)
             if [ -n "$result" ]; then
                 $TODO_FULL_SH more add "$result"
-                itemno=$(tail -n 1 "$TODO_FILE" | striptags | grep -Po "\d+ .*$" | cut -d" " -f 1)
+                itemno=$(wc -l "$TODO_FILE")
                 $TODO_FULL_SH timetrack start "$itemno"
+            else 
+                [ "$TODOTXT_NOTIFY" = 1 ] && notify-send -a "Error, no text provided?"
             fi
             break
             ;;
