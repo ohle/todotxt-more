@@ -35,8 +35,11 @@ while true; do
     itemno=$(echo "$result" | striptags | grep -Po "\d+ .*$" | cut -d" " -f 1)
     case $ret in
         10)
-            $TODO_FULL_SH more add "$result"
-            $TODO_FULL_SH timetrack start "$result"
+            if [ -n "$result" ]; then
+                $TODO_FULL_SH more add "$result"
+                itemno=$(tail -n 1 "$TODO_FILE" | striptags | grep -Po "\d+ .*$" | cut -d" " -f 1)
+                $TODO_FULL_SH timetrack start "$itemno"
+            fi
             break
             ;;
         11)
