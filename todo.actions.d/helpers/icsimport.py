@@ -29,48 +29,54 @@ for task in chain(todo.tasks,done.tasks):
 
 changed = False
 errcode = 1
-cal = Calendar(sys.stdin.read())
-for event in chain(cal.events, cal.todos):
-    if event.uid and event.uid in found:
-        print(f"Skipping existing UID {event.uid}")
-        errcode = 2
-        continue
+data = sys.stdin.read()
+try:
+    cals = [Calendar(data)]
+except NotImplementedError:
+    cals = Calendar.parse_multiple(data)
 
-    taskline = ""
-    if isinstance(event, Event) and event.all_day:
-        begin = event.begin.format("YYYY-MM-DD")
-        taskline += f"@calendar due:{begin}"
-    elif event.begin:
-        begin = event.begin.format("YYYY-MM-DDTHH:mm:ss")
-        taskline += f"@calendar due:{begin}"
-    elif isinstance(event, Todo) and event.dtstamp:
-        created = event.begin.format("YYYY-MM-DD")
-        taskline += f"{created} "
+for cal in cals:
+    for event in chain(cal.events, cal.todos):
+        if event.uid and event.uid in found:
+            print(f"Skipping existing UID {event.uid}")
+            errcode = 2
+            continue
 
-    if event.name:
-        taskline += " " + event.name
-    else:
-        print("Event has no summary, skipping", file=sys.stderr)
-        continue
-    if event.location:
-        taskline += f" location:{event.location}"
-    if event.url:
-        taskline += f" url:{event.url}"
-    if isinstance(event, Event) and event.end:
-        end = event.end.format("YYYY-MM-DDTHH:mm:ss")
-        taskline += f" end:{end}"
-    if isinstance(event, Event) and event.categories:
-        for category in event.categories:
-            taskline += f" #{category}"
-    if event.uid:
-        taskline += f" ics:{event.uid}"
-    if event.description:
-        taskline += " :: " + event.description.replace("\n"," ")
-    taskline = taskline.strip()
-    task = pytodotxt.Task(taskline)
-    todo.add(task)
-    changed = True
-    print("Added: ", taskline, file=sys.stderr)
+        taskline = ""
+        if isinstance(event, Event) and event.all_day:
+            begin = event.begin.format("YYYY-MM-DD")
+            taskline += f"@calendar due:{begin}"
+        elif event.begin:
+            begin = event.begin.format("YYYY-MM-DDTHH:mm:ss")
+            taskline += f"@calendar due:{begin}"
+        elif isinstance(event, Todo) and event.dtstamp:
+            created = event.begin.format("YYYY-MM-DD")
+            taskline += f"{created} "
+
+        if event.name:
+            taskline += " " + event.name
+        else:
+            print("Event has no summary, skipping", file=sys.stderr)
+            continue
+        if event.location:
+            taskline += f" location:{event.location}"
+        if event.url:
+            taskline += f" url:{event.url}"
+        if isinstance(event, Event) and event.end:
+            end = event.end.format("YYYY-MM-DDTHH:mm:ss")
+            taskline += f" end:{end}"
+        if isinstance(event, Event) and event.categories:
+            for category in event.categories:
+                taskline += f" #{category}"
+        if event.uid:
+            taskline += f" ics:{event.uid}"
+        if event.description:
+            taskline += " :: " + event.description.replace("\n"," ")
+        taskline = taskline.strip()
+        task = pytodotxt.Task(taskline)
+        todo.add(task)
+        changed = True
+        print("Added: ", taskline, file=sys.stderr)
 
 #pytodotxt stumbles over symlinks (overwriting them with a new file rather than following them), so we do it this way:
 if changed:

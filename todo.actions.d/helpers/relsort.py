@@ -3,6 +3,7 @@
 import fileinput
 import datetime
 import re
+import sys
 
 
 TAG_DATE = re.compile(r'\d\d\d\d-\d\d-\d\d')
@@ -43,10 +44,28 @@ for line in fileinput.input():
             #due dates take precedence over creation dates
             i_orig = i
             i = hasdue[0] 
+
+            year = int(fields[i][4:8])
+            month = int(fields[i][9:11])
+            day = int(fields[i][12:14])
             if len(fields[i]) > 14:
-                dt = datetime.datetime(int(fields[i][4:8]), int(fields[i][9:11]), int(fields[i][12:14]), int(fields[i][15:17]),int(fields[i][18:20]),int(fields[i][21:23]))
+                hour = int(fields[i][15:17])
+                try:
+                    min = int(fields[i][18:20])
+                except:
+                    min = 0
+                try:
+                    sec = int(fields[i][21:23])
+                except:
+                    sec = 0
+                try:
+                    dt = datetime.datetime(year, month, day, hour,min,sec)
+                except ValueError:
+                    print(fields, file=sys.stderr)
+                    print(year,month,day,hour,min,sec, file=sys.stderr)
+                    raise
             else:
-                dt = datetime.datetime(int(fields[i][4:8]), int(fields[i][9:11]), int(fields[i][12:14]))
+                dt = datetime.datetime(year, month, day)
             days = int((dt.timestamp() - today.timestamp()) / (3600*24))
             if days >= 0:
                 v = "%04dd+" % days
