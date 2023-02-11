@@ -27,6 +27,7 @@ echo -e "0 - Start task (track in log)
 5 - Edit
 6 - View issue/mail
 8 - Print to output
+9 - Append extra info
 A - Set priority A
 B - Set priority B
 C - Set priority C
@@ -88,6 +89,22 @@ else
             ;;
         7)
             $TODO_FULL_SH format show $extra $itemno
+            ;;
+        9|append)
+            $TODO_FULL_SH listproj > /tmp/todo.projects.txt
+            $TODO_FULL_SH listcon >> /tmp/todo.projects.txt
+            echo "due:$(date +"%Y-%m-%d %a")" >> /tmp/todo.projects.txt
+            echo "due:$(date --date tomorrow +"%Y-%m-%d %a")" >> /tmp/todo.projects.txt
+            for i in $(seq 2 30); do
+                echo "due:$(date --date "$i days" +"%Y-%m-%d %a")" >> /tmp/todo.projects.txt
+            done
+            EXTRA=$(cat /tmp/todo.projects.txt | rofi -matching glob -tokenize -i -no-sort -no-levenshtein-sort -markup -markup-rows -dmenu -p "NEW>" -mesg "Extra project/context to add to task" | cut -d" " -f 1)
+            if [ -n "$EXTRA" ]; then
+                if [ -n "$TODOTXT_INFERMAP" ]; then
+                    EXTRA=$("$SCRIPTDIR/helpers/infer.py" "$TODOTXT_INFERMAP" "$EXTRA")
+                fi
+                $TODO_FULL_SH append "$itemno" "$EXTRA"
+            fi
             ;;
         A)
             echo "Setting priority">&2
