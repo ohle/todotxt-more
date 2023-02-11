@@ -16,13 +16,12 @@ shift
   echo "  Fuzzy search:"
   echo "    rofi [ACTIONS]"
   echo "      pass actions through rofi and make them actionable"
+  echo "    rofi new"
+  echo "      add new task interactively via menus"
   echo ""
   exit
 }
 
-if [ $# -eq 0 ]; then
-    set -- list
-fi
 
 [ -z $TERMINAL_CMD ] && export TERMINAL_CMD="foot -e"
 [ -z $EDITOR ] && export EDITOR="vim"
@@ -53,6 +52,12 @@ newtask() {
         ret=$?
     done
 }
+
+if [ $# -eq 0 ]; then
+    set -- list
+elif [ "$1" = "new" ]; then
+    newtask
+fi
 
 actionmenu() {
     [ -n "$1" ] && itemno=$1
