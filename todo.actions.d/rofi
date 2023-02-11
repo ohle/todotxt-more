@@ -28,9 +28,50 @@ fi
 [ -z $EDITOR ] && export EDITOR="vim"
 [ -z "$TIMETRACK_FILE" ] && TIMETRACK_FILE="$TODO_DIR/timetrack.txt"
 
+
+newtask() {
+    $TODO_FULL_SH listproj > /tmp/todo.projects.txt
+    $TODO_FULL_SH listcon >> /tmp/todo.projects.txt
+    PROJ=$(cat /tmp/todo.projects.txt | rofi -matching glob -tokenize -i -no-sort -no-levenshtein-sort -markup -markup-rows -dmenu -p "NEW>" -mesg "Project/context for new task")
+        
+    TASK=$(rofi -dmenu -p "New Task Description")
+    if [ -n "$PROJ" ]; then
+        case "$PROJ" in
+            "@"*)
+                TASK="$TASK $PROJ"
+                ;;
+            "+"*)
+                TASK="$PROJ $TASK"
+                ;;
+        esac
+    fi
+    $TODO_FULL_SH more add "$TASK"
+    itemno=$(wc -l "$TODO_FILE" | cut -d " " -f 1)
+    ret=0
+    while [ $ret -ne 1 ]; do
+        actionmenu "$itemno"
+        ret=$?
+    done
+}
+
+actionmenu() {
+    [ -n "$1" ] && itemno=$1
+    item=$($TODO_FULL_SH format pango show "$itemno")
+    action=$($TODO_FULL_SH actionmenu | rofi -matching glob -tokenize -i -no-levenshtein-sort -markup -markup-rows -dmenu -mesg "$item" | striptags | grep -P "[\dABCq] .*" | cut -d" " -f 1) 
+
+    echo "POST"
+    if [ "$action" = "q" ] || [ -z "$action" ]; then
+        return 1
+    fi
+    if ! $TODO_FULL_SH actionmenu "$action" "$itemno"; then
+        return 2
+    fi
+    sleep 1
+}
+
 itemno=""
 while true; do
-    result=$($TODO_FULL_SH relsort "$@" | $TODO_FULL_SH format pango stdin | rofi -matching glob -tokenize -i -no-sort -no-levenshtein-sort -markup -markup-rows -dmenu -p ">" -mesg "todo.txt - <span fgcolor=\"gray\">alt-e = edit, alt-a = add and timetrack, alt-d = done, alt-k = priup, alt-j = pridown, alt-t = edit timetrack</span>" -kb-custom-1 "Alt-a" -kb-custom-2 "Alt-e" -kb-custom-3 "Alt-d" -kb-custom-4 "Alt-j" -kb-custom-5 "Alt-k" -kb-custom-6 "Alt-t")
+    result=$($TODO_FULL_SH relsort "$@" | $TODO_FULL_SH format pango stdin | rofi -matching glob -tokenize -i -no-sort -no-levenshtein-sort -markup -markup-rows -dmenu -p ">" -mesg "todo.txt - <span fgcolor=\"gray\">alt-e = edit, alt-a = add and timetrack, alt-d = done, alt-k = priup, alt-j = pridown, alt-t = edit timetrack, alt-n = new</span>" -kb-custom-1 "Alt-a" -kb-custom-2 "Alt-e" -kb-custom-3 "Alt-d" -kb-custom-4 "Alt-j" -kb-custom-5 "Alt-k" -kb-custom-6 "Alt-t" -kb-custom-7 "Alt-n")
     ret=$?
     itemno=$(echo "$result" | striptags | grep -Po "\d+ .*$" | cut -d" " -f 1)
     case $ret in
@@ -60,22 +101,16 @@ while true; do
         15)
             $TERMINAL_CMD $EDITOR +999999 "$TIMETRACK_FILE"
             ;;
+        16)
+            newtask
+            ;;
         0)
             if [ -n "$itemno" ]; then
-                item=$($TODO_FULL_SH format pango show "$itemno")
-                action=$($TODO_FULL_SH actionmenu | rofi -matching glob -tokenize -i -no-levenshtein-sort -markup -markup-rows -dmenu -mesg "$item" | striptags | grep -P "[\dABCq] .*" | cut -d" " -f 1) 
-
-                if [ "$action" = "q" ] || [ -z "$action" ]; then
-                    break
-                fi
-                if ! $TODO_FULL_SH actionmenu "$action" "$itemno"; then
-                    break
-                fi
-                sleep 1
+                actionmenu || break
             elif [ -n "$result" ]; then
                 #add new item
                 $TODO_FULL_SH more add "$result"
-                break
+                return 1
             fi
             ;;
         *)
