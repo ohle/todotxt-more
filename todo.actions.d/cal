@@ -11,9 +11,10 @@ SCRIPTDIR="$(dirname $0)"
 
 [ "$action" = "usage" ] && {
   echo "  calendar support:"
-  echo "    cal import [[--edit]] [filename]"
+  echo "    cal import [[--edit|--editmenu]] [filename]"
   echo "      imports an ics file. Takes care not to import duplicates. filename may also be - for stdin"
-  echo "      add the -e option if you want to edit the item immediately after adding (to add tags etc)"
+  echo "      add the --edit option if you want to edit the item immediately after adding (to add tags etc)"
+  echo "      add the --editmenu option if you want interactively edit the item in rofi immediately after adding (to add tags etc)"
   echo "    cal export [itemno] .."
   echo "      export the specified item numbers to ics (to stdout)"
   echo "    cal list [[--headers|-H]"
@@ -34,13 +35,16 @@ if [ $# -eq 0 ]; then
 fi
 
 if [ "$1" = "import" ]; then
+    shift
     if [ "$1" = "-e" ] || [ "$1" == "--edit" ]; then
+        shift
+        edit=1
+    elif [ "$1" = "-m" ] || [ "$1" == "--editmenu" ]; then
         shift
         edit=1
     else
         edit=0
     fi
-    shift
     filename=$1
     if [ ! -e "$filename" ]; then
         echo "no such file to import: $filename"
@@ -49,6 +53,9 @@ if [ "$1" = "import" ]; then
         item="$(tail -n 1 "$TODO_FILE")"
         [ "$TODOTXT_NOTIFY" = 1 ] && notify-send -a "todo.txt-more" "Calendar task added" "$item"
         [ $edit -eq 1 ] && $TODO_FULL_SH edit 999999
+        if [ $edit -eq 2 ]; then
+            $TODO_FULL_SH rofi actionmenu $(wc -l "$TODO_FILE" | cut -d" " -f 1)
+        fi
     else
         if [ $? -eq 2 ]; then
             [ "$TODOTXT_NOTIFY" = 1 ] && notify-send -a "todo.txt-more" "Calendar item already exists"
