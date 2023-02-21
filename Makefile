@@ -1,5 +1,5 @@
 pythondeps:
-	pip install --user -r requirements.txt
+	python3 -m pip install --user -r requirements.txt
 
 install:
 	mkdir -p ~/.todo.actions.d
