@@ -9,6 +9,8 @@ striptags() {
     sed -e 's/<[^>]*>//g'
 }
 
+rofi="rofi -config ${HOME}/.config/rofi/solarized-todofish.rasi"
+
 action=$1
 shift
 
@@ -33,9 +35,9 @@ shift
 newtask() {
     $TODO_FULL_SH listproj > /tmp/todo.projects.txt
     $TODO_FULL_SH listcon >> /tmp/todo.projects.txt
-    PROJ=$(cat /tmp/todo.projects.txt | rofi -matching glob -tokenize -i -no-sort -no-levenshtein-sort -markup -markup-rows -dmenu -p "NEW>" -mesg "Project/context for new task")
+    PROJ=$(cat /tmp/todo.projects.txt | ${rofi} -matching glob -tokenize -i -no-sort -no-levenshtein-sort -markup -markup-rows -dmenu -p "NEW>" -mesg "Project/context for new task")
         
-    TASK=$(rofi -dmenu -p "New Task Description")
+    TASK=$(${rofi} -dmenu -p "New Task Description")
     if [ -n "$PROJ" ]; then
         case "$PROJ" in
             "@"*)
@@ -59,7 +61,7 @@ newtask() {
 actionmenu() {
     [ -n "$1" ] && itemno=$1
     item=$($TODO_FULL_SH format pango show "$itemno")
-    action=$($TODO_FULL_SH actionmenu | rofi -matching glob -tokenize -i -no-levenshtein-sort -markup -markup-rows -dmenu -p Action -mesg "$item" | striptags | grep -P "[\dABCq] .*" | cut -d" " -f 1) 
+    action=$($TODO_FULL_SH actionmenu | ${rofi} -matching glob -tokenize -i -no-levenshtein-sort -markup -markup-rows -dmenu -p Action -mesg "$item" | striptags | grep -P "[\dABCq] .*" | cut -d" " -f 1) 
     if [ "$action" = "q" ] || [ -z "$action" ]; then
         return 1
     fi
@@ -83,7 +85,7 @@ fi
 
 itemno=""
 while true; do
-    result=$($TODO_FULL_SH relsort "$@" | $TODO_FULL_SH format pango stdin | rofi -matching glob -tokenize -i -no-sort -no-levenshtein-sort -markup -markup-rows -dmenu -p ">" -mesg "todo.txt - <span fgcolor=\"gray\">alt-e = edit, alt-a = add and timetrack, alt-d = done, alt-k = priup, alt-j = pridown, alt-t = edit timetrack, alt-n = new</span>" -kb-custom-1 "Alt-a" -kb-custom-2 "Alt-e" -kb-custom-3 "Alt-d" -kb-custom-4 "Alt-j" -kb-custom-5 "Alt-k" -kb-custom-6 "Alt-t" -kb-custom-7 "Alt-n")
+    result=$($TODO_FULL_SH relsort "$@" | $TODO_FULL_SH format pango stdin | ${rofi} -matching glob -tokenize -i -no-sort -no-levenshtein-sort -markup -markup-rows -dmenu -p ">" -mesg "todo.txt - <span fgcolor=\"gray\">alt-e = edit, alt-a = add and timetrack, alt-d = done, alt-k = priup, alt-j = pridown, alt-t = edit timetrack, alt-n = new</span>" -kb-custom-1 "Alt-a" -kb-custom-2 "Alt-e" -kb-custom-3 "Alt-d" -kb-custom-4 "Alt-j" -kb-custom-5 "Alt-k" -kb-custom-6 "Alt-t" -kb-custom-7 "Alt-n")
     ret=$?
     itemno=$(echo "$result" | striptags | grep -Po "\d+ .*$" | cut -d" " -f 1)
     case $ret in
