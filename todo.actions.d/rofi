@@ -27,7 +27,7 @@ shift
 }
 
 
-[ -z $TERMINAL_CMD ] && export TERMINAL_CMD="foot -e"
+[ -z $TERMINAL_CMD ] && export TERMINAL_CMD="alacritty -e"
 [ -z $EDITOR ] && export EDITOR="vim"
 [ -z "$TIMETRACK_FILE" ] && TIMETRACK_FILE="$TODO_DIR/timetrack.txt"
 
