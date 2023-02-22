@@ -9,7 +9,7 @@ striptags() {
     sed -e 's/<[^>]*>//g'
 }
 
-rofi="rofi -config ${HOME}/.config/rofi/solarized-todofish.rasi"
+rofi="rofi -config ${HOME}/.config/rofi/solarized-todofish.rasi -async-pre-read 0"
 
 action=$1
 shift
