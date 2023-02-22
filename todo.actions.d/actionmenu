@@ -19,8 +19,8 @@ shift
 }
 
 if [ $# -eq 0 ]; then
-echo -e "0 - Start task (track in log)
-1 - Mark as done
+echo -e "0 - Mark as done
+1 - Start task (track in log)
 2 - Increase priority
 3 - Decrease priority
 4 - Remove priority
@@ -51,15 +51,15 @@ else
         exit 1
     fi
     case $action in
-        0|timetrack)
-            echo "Starting timetrack">&2
-            $TODO_FULL_SH timetrack start $itemno
-            exit 10 #signal for rofi/fzf handler to exit after
-            ;;
-        1|done)
+        0|done)
             echo "Marking as done">&2
             $TODO_FULL_SH more done $itemno
             exit 10
+            ;;
+        1|timetrack)
+            echo "Starting timetrack">&2
+            $TODO_FULL_SH timetrack start $itemno
+            exit 10 #signal for rofi/fzf handler to exit after
             ;;
         2|priup)
             echo "Increasing priority">&2
