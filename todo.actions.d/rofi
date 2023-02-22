@@ -35,7 +35,7 @@ shift
 newtask() {
     $TODO_FULL_SH listproj > /tmp/todo.projects.txt
     $TODO_FULL_SH listcon >> /tmp/todo.projects.txt
-    PROJ=$(cat /tmp/todo.projects.txt | ${rofi} -matching glob -tokenize -i -no-sort -no-levenshtein-sort -markup -markup-rows -dmenu -p "NEW>" -mesg "Project/context for new task")
+    PROJ=$(cat /tmp/todo.projects.txt | ${rofi} -multi-select -matching glob -tokenize -i -no-sort -no-levenshtein-sort -markup -markup-rows -dmenu -p "NEW>" -mesg "Project/context for new task")
         
     TASK=$(${rofi} -dmenu -p "New Task Description")
     if [ -n "$PROJ" ]; then
