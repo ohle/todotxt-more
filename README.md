@@ -1,5 +1,7 @@
 # todo.txt-more
 
+Forked from https://git.sr.ht/~proycon/todotxt-more
+
 ## Introduction
 
 This is a set of complementary extensions for todo.txt .
